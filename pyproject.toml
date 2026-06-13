@@ -1,0 +1,62 @@
+[project]
+name = "alrin"
+version = "0.0.0"
+description = "Arch Linux repository for ivasilev.net"
+license = "Unlicense"
+readme = "README.md"
+requires-python = ">=3.14"
+
+authors = [
+  { name = "Ianis Vasilev", email = "ianis@ivasilev.net" }
+]
+
+classifiers = [
+  "Private :: Do Not Upload",
+]
+
+dependencies = [
+  "click (>=8)",
+  "colorlog (>=6)",
+  "pygit2 (>=1.19)",
+  "viat (>=0.10.4)",
+  "python-gnupg (>=0.5.6)",
+  "python-alpm (>=0.4)",
+]
+
+[project.scripts]
+alrin = "alrin.cli:alrin"
+
+[dependency-groups]
+dev = [
+  "mypy (>=2.1)",
+  "ruff (>=0.15)",
+  "ruff-config-ivasilev @ git+https://github.com/v--/ruff-config-ivasilev.git@v0.15post7",
+]
+
+[build-system]
+# uv build complains if no upper bound is set, but it updates its minor versions often, so we put a major version just to shut it up
+requires = ["uv_build (>=0.10, <1)"]
+build-backend = "uv_build"
+
+[tool.uv]
+resolution = "lowest-direct"
+
+# ruff
+[tool.ruff]
+extend = ".venv/share/ruff/ruff.ivasilev.toml"
+
+[tool.ruff.lint]
+ignore = [
+  "D1",      # undocumented-*
+]
+
+# mypy
+[tool.mypy]
+packages = ["alrin"]
+
+[[tool.mypy.overrides]]
+module = [
+  "colorlog.*",
+  "gnupg.*",
+]
+ignore_missing_imports = true

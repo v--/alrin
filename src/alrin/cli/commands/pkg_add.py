@@ -1,0 +1,73 @@
+import shutil
+
+import click
+import pygit2
+from alpm.alpm_srcinfo import SourceInfoError, source_info_from_file
+
+from alrin.exceptions import AlrinPackageMetadataError
+from alrin.resolver import AlrinPathResolver
+from alrin.source import AlrinPackageSource
+from alrin.workflow import (
+    alpmdb_add_packages,
+    clean_worktree,
+    makepkg_inside_jail,
+    postprocess_pkgbuild,
+    preprocess_pkgbuild,
+    process_built_files,
+    unregister_submodule,
+)
+
+from .group import AlrinSharedState, alrin
+
+
+URL_PATTERN = 'https://aur.archlinux.org/{pkgname}.git'
+
+
+@alrin.command()
+@click.argument('pkgname')
+@click.pass_obj
+def pkg_add(shared: AlrinSharedState, pkgname: str) -> None:
+    url = URL_PATTERN.format(pkgname=pkgname)
+    resolver = AlrinPathResolver(shared.vault)
+    pkg_path = resolver.pkg_get(pkgname)
+    rel_path = resolver.relativize(pkg_path)
+
+    if pkg_path.exists():
+        raise AlrinPackageMetadataError(f'Directory at {rel_path.as_posix()!r} already exists')
+
+    shared.logger.info(f'Adding {url} as a submodule into {rel_path.as_posix()!r}.')
+    root_repo = pygit2.Repository(shared.resolver.get_root())
+
+    try:
+        root_repo.submodules.add(url, rel_path.as_posix())
+    except pygit2.GitError as err:
+        shared.logger.error(f'Unregistering invalid repository from {rel_path.as_posix()!r}.')  # noqa: TRY400
+        shutil.rmtree(rel_path)
+        unregister_submodule(shared, rel_path)
+        raise AlrinPackageMetadataError(f'Invalid git repository at {url!r}') from err
+
+    try:
+        srcinfo = source_info_from_file(pkg_path.joinpath('.SRCINFO'))
+    except SourceInfoError as err:
+        shared.logger.error(f'Unregistering invalid repository from {rel_path.as_posix()!r}.')  # noqa: TRY400
+        shutil.rmtree(rel_path)
+        unregister_submodule(shared, rel_path)
+        raise AlrinPackageMetadataError(f'Could not read .SRCINFO at {rel_path.as_posix()!r}') from err
+
+    shared.logger.info(f'Adding mock Viat metadata for {rel_path.as_posix()!r}.')
+    with shared.vault.storage as conn, conn.get_mutator(pkg_path) as mut:
+        mut['pkgver'] = '0'
+        mut['pkgrel'] = '0'
+
+        if any(str(dep) == 'python' for dep in srcinfo.base.dependencies) and click.confirm('Mark as Python package?', True):
+            mut['add_python_suffix'] = True
+
+    shared.logger.info(f'Building {pkgname}.')
+    pkg = AlrinPackageSource(shared, pkgname)
+    preprocess_pkgbuild(pkg)
+    makepkg_inside_jail(pkg)
+    postprocess_pkgbuild(pkg)
+
+    dest_files = process_built_files(pkg)
+    clean_worktree(pkg)
+    alpmdb_add_packages(pkg.shared, dest_files)

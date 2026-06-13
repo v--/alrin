@@ -1,0 +1,2 @@
+[tracker.glob]
+patterns = ["pkgbuild/*"]
