@@ -1,3 +1,4 @@
+import logging
 import subprocess
 from typing import TYPE_CHECKING
 
@@ -12,6 +13,7 @@ if TYPE_CHECKING:
 
 
 DEFAULT_REPOSITORY_NAME = 'ivasilev'
+logger = logging.getLogger(__name__)
 
 
 def alpmdb_add_packages(
@@ -37,7 +39,7 @@ def alpmdb_add_packages(
             continue
 
         db_name = f'{arch}/{repo_name}.db.tar.zst'
-        shared.logger.info(f'Adding {pkg_len} {'package' if pkg_len == 1 else 'packages'} to {db_name!r}.')
+        logger.info(f'Adding {pkg_len} {'package' if pkg_len == 1 else 'packages'} to {db_name!r}.')
 
         try:
             subprocess.run(
@@ -68,7 +70,7 @@ def alpmdb_remove_packages(
 
         pkg_len = len(package_names)
         db_name = f'{arch}/{repo_name}.db.tar.zst'
-        shared.logger.info(f'Removing {pkg_len} {'package' if pkg_len == 1 else 'packages'} from {db_name!r}.')
+        logger.info(f'Removing {pkg_len} {'package' if pkg_len == 1 else 'packages'} from {db_name!r}.')
 
         try:
             subprocess.run(

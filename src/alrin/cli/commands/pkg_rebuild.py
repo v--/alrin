@@ -1,6 +1,7 @@
 import click
 
 from alrin.exceptions import AlrinPackageMetadataError
+from alrin.logging import setup_logging
 from alrin.source import AlrinPackageSource
 from alrin.workflow import (
     alpmdb_add_packages,
@@ -18,6 +19,8 @@ from .group import AlrinSharedState, alrin
 @click.argument('pkgname')
 @click.pass_obj
 def pkg_rebuild(shared: AlrinSharedState, pkgname: str) -> None:
+    setup_logging()
+
     pkg = AlrinPackageSource(shared, pkgname)
 
     clean_worktree(pkg)

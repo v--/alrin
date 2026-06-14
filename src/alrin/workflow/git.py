@@ -1,4 +1,5 @@
 import contextlib
+import logging
 import shutil
 import subprocess
 from typing import TYPE_CHECKING
@@ -9,17 +10,19 @@ from alrin.exceptions import AlrinPackageMetadataError
 
 
 if TYPE_CHECKING:
-    import pathlib
 
     from alrin.source import AlrinPackageSource
     from alrin.state import AlrinSharedState
+
+
+logger = logging.getLogger(__name__)
 
 
 def clean_worktree(pkg: AlrinPackageSource) -> None:
     if pkg.repo is None:
         raise AlrinPackageMetadataError('No git repository specified')
 
-    pkg.shared.logger.info(f'Clearing working tree in {pkg.get_rel_path().as_posix()!r}.')
+    pkg.bound_logger.info('Clearing working tree.')
     pkg.repo.checkout_head(
         strategy=pygit2.GIT_CHECKOUT_FORCE | pygit2.GIT_CHECKOUT_REMOVE_UNTRACKED | pygit2.GIT_CHECKOUT_REMOVE_UNTRACKED,
     )
@@ -34,7 +37,7 @@ def update_repo(pkg: AlrinPackageSource) -> None:
     except StopIteration:
         raise AlrinPackageMetadataError("No remote named 'origin' set") from None
 
-    pkg.shared.logger.info(f'Updating repository {pkg.get_rel_path().as_posix()!r}.')
+    pkg.bound_logger.info('Updating repository.')
     remote.fetch()
 
     try:
@@ -48,14 +51,16 @@ def update_repo(pkg: AlrinPackageSource) -> None:
     clean_worktree(pkg)
 
 
-def unregister_submodule(shared: AlrinSharedState, rel_path: pathlib.Path) -> None:
+def unregister_submodule(shared: AlrinSharedState, pkgname: str) -> None:
     # Removing a git module is tricky. We remove the directory itself only after unregistering it.
     # See https://stackoverflow.com/a/35743109/2756776
     root_path = shared.resolver.get_root()
+    rel_path = shared.resolver.get_pkg(pkgname).relative_to(root_path)
+    bound_logger = logging.LoggerAdapter(logger, extra=dict(subject=pkgname))
     raw_path = rel_path.as_posix()
 
     # libgit2 cannot handle submodule deletion
-    shared.logger.info(f'Unstaging git submodule {raw_path!r}.')
+    bound_logger.info('Unstaging git submodule.')
     with contextlib.suppress(subprocess.CalledProcessError):
         subprocess.run(
             [
@@ -65,7 +70,7 @@ def unregister_submodule(shared: AlrinSharedState, rel_path: pathlib.Path) -> No
             cwd=root_path,
         )
 
-    shared.logger.info(f'Removing git config for {raw_path!r}.')
+    bound_logger.info('Unregistering git submodule.')
     with contextlib.suppress(subprocess.CalledProcessError):
         subprocess.run(
             [
@@ -75,7 +80,7 @@ def unregister_submodule(shared: AlrinSharedState, rel_path: pathlib.Path) -> No
             cwd=root_path,
         )
 
-    shared.logger.info(f'Removing git submodule config for {raw_path!r}.')
+    bound_logger.info('Removing git submodule config.')
     with contextlib.suppress(subprocess.CalledProcessError):
         subprocess.run(
             [
@@ -88,5 +93,5 @@ def unregister_submodule(shared: AlrinSharedState, rel_path: pathlib.Path) -> No
     internal_module_path = shared.resolver.get_root() / '.git' / 'modules' / raw_path
 
     if internal_module_path.exists():
-        shared.logger.info(f'Removing internal git clone of {raw_path!r}.')
+        bound_logger.info('Removing internal git submodule clone.')
         shutil.rmtree(internal_module_path)

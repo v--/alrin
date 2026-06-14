@@ -1,5 +1,7 @@
+
 import click
 
+from alrin.logging import setup_logging
 from alrin.source import AlrinPackageSource
 from alrin.workflow import (
     alpmdb_add_packages,
@@ -18,12 +20,14 @@ from .group import AlrinSharedState, alrin
 @click.argument('pkgname')
 @click.pass_obj
 def pkg_update(shared: AlrinSharedState, pkgname: str) -> None:
+    setup_logging()
+
     pkg = AlrinPackageSource(shared, pkgname)
     update_repo(pkg)
     preprocess_pkgbuild(pkg)
 
     if pkg.version == pkg.viat_meta.version:
-        shared.logger.info(f'Package {pkgname!r} is up-to-date.')
+        pkg.bound_logger.info('Package is up-to-date.')
         clean_worktree(pkg)
         return
 

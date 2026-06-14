@@ -32,7 +32,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8" },
-    { name = "colorlog", specifier = ">=6" },
+    { name = "colorlog", specifier = ">=6.8" },
     { name = "pygit2", specifier = ">=1.19" },
     { name = "python-alpm", specifier = ">=0.4" },
     { name = "python-gnupg", specifier = ">=0.5.6" },
@@ -151,14 +151,14 @@ wheels = [
 
 [[package]]
 name = "colorlog"
-version = "6.4.0"
+version = "6.8.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f6/be/db4808dff4e1c05bfabe89bf8a23292d62fe71c737d225e458d89dc83108/colorlog-6.4.0.tar.gz", hash = "sha256:551c5a36cbfac5a010d8cccb26b811a18895d4612bb9b995a833d16a1d89d5f0", size = 30529, upload-time = "2021-08-23T10:02:43.295Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1f/b0/e4e3850d43f5429f9e53404056d705117fbb8a4d9e755425e762a9f68317/colorlog-6.8.0.tar.gz", hash = "sha256:fbb6fdf9d5685f2517f388fb29bb27d54e8654dd31f58bc2a3b217e967a95ca6", size = 29939, upload-time = "2023-12-02T16:47:01.864Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c4/a9/014dbada072074c94ed00c46ffe2d02a1536f2c0f30ce4157027d1c4cfd9/colorlog-6.4.0-py2.py3-none-any.whl", hash = "sha256:590f19b065f34671d8f19b294b0f7ea6f13d09e7f7bf2993326edb008cfa1152", size = 11065, upload-time = "2021-08-23T10:02:41.54Z" },
+    { url = "https://files.pythonhosted.org/packages/95/df/520663eb7f7a329f7c585834b754bcc3cbcc03957d85fcbba4a2a723ad9d/colorlog-6.8.0-py3-none-any.whl", hash = "sha256:4ed23b05a1154294ac99f511fabe8c1d6d4364ec1f7fc989c7fb515ccc29d375", size = 11284, upload-time = "2023-12-02T16:46:59.416Z" },
 ]
 
 [[package]]

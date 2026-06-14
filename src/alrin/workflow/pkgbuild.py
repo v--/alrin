@@ -57,7 +57,7 @@ def preprocess_pkgbuild(pkg: AlrinPackageSource) -> None:
     pkgbuild_path = pkg.get_abs_path().joinpath('PKGBUILD')
 
     if pkg.viat_meta.extra_makedepends is not None:
-        pkg.shared.logger.info(f'Using custom extra_makedepends list for {pkg.pkgname!r}.')
+        pkg.bound_logger.info('Adding custom extra_makedepends list.')
         pkgbuild = pkgbuild_path.read_text('utf-8')
         extra_makedepends = ' '.join(repr(dep) for dep in pkg.viat_meta.extra_makedepends)
 
@@ -80,7 +80,7 @@ def preprocess_pkgbuild(pkg: AlrinPackageSource) -> None:
     pkgrel = pkgbuild_version.pkgrel
 
     if not pkgrel.endswith(version_suffix):
-        pkg.shared.logger.info(f'Adding a pkgrel suffix {version_suffix} for {pkg.pkgname!r}.')
+        pkg.bound_logger.info(f'Adding a pkgrel suffix {version_suffix}.')
         pkgbuild_path.write_text(
             re.sub(r'(?<=pkgrel=).+', 'pkgrel=' + pkgrel + version_suffix, pkgbuild_path.read_text('utf-8')),
         )

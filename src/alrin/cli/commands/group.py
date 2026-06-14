@@ -8,7 +8,6 @@ from viat import ViatError, ViatVault
 from viat.vault import locate_existing_vault_root
 
 from alrin.exceptions import AlrinPackageError
-from alrin.logging import AlrinLogger
 from alrin.resolver import AlrinPathResolver
 from alrin.state import AlrinSharedState
 
@@ -42,7 +41,6 @@ def alrin(ctx: click.Context) -> None:
     ctx.obj = AlrinSharedState(
         vault,
         AlrinPathResolver(vault),
-        AlrinLogger('alrin'),
     )
 
     ctx.with_resource(with_cli_exception_handler())

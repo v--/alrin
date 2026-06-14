@@ -1,3 +1,4 @@
+import logging
 import subprocess
 from typing import TYPE_CHECKING
 
@@ -8,11 +9,14 @@ if TYPE_CHECKING:
     from alrin.source import AlrinPackageSource
 
 
+logger = logging.getLogger(__name__)
+
+
 def makepkg_inside_jail(pkg: AlrinPackageSource, builddate: int | None = None) -> None:
     jail_path = pkg.shared.resolver.get_jail()
 
     if jail_path.exists():
-        pkg.shared.logger.info('Preparing existing jail.')
+        logger.info('Preparing existing jail.')
 
         try:
             subprocess.run(
@@ -25,7 +29,7 @@ def makepkg_inside_jail(pkg: AlrinPackageSource, builddate: int | None = None) -
         except subprocess.CalledProcessError as err:
             raise AlrinPackageMetadataError('Jail update failed') from err
     else:
-        pkg.shared.logger.info('Creating new jail.')
+        logger.info('Creating new jail.')
         jail_path.mkdir()
 
         try:
@@ -43,7 +47,7 @@ def makepkg_inside_jail(pkg: AlrinPackageSource, builddate: int | None = None) -
             raise AlrinPackageMetadataError('Jail creation failed') from err
 
 
-    pkg.shared.logger.info('Building inside jail.')
+    pkg.bound_logger.info('Building inside jail.')
 
     try:
         subprocess.run(

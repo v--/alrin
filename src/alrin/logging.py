@@ -4,17 +4,22 @@ import sys
 import colorlog
 
 
-class AlrinLogger(logging.Logger):
-    handler: logging.StreamHandler
-
-    def __init__(self, name: str) -> None:
-        super().__init__(name)
-        self.handler = logging.StreamHandler(sys.stderr)
-        self.handler.setFormatter(
+class AlrinLoggerHandler(logging.StreamHandler):
+    def __init__(self) -> None:
+        super().__init__()
+        self.setFormatter(
             colorlog.ColoredFormatter(
-                '%(bold)s%(asctime)s%(reset)s %(bold)s%(log_color)s%(levelname)s%(bold)s%(reset)s %(message)s',
-                datefmt='%H:%M:%S',
+                stream=sys.stderr,  # Without explicitly setting the stream, TTY detection does not work.
+                style='{',
+                fmt='{green}{asctime}{reset} {bold}{log_color}{levelname:8}{reset} {cyan}{subject}{reset} {log_color}{message}{reset}',
+                datefmt='%X',
+                defaults={'subject': '<system>'},
+                log_colors={**colorlog.default_log_colors, 'INFO': 'white'},
             ),
         )
 
-        self.addHandler(self.handler)
+
+def setup_logging(verbose: bool = False) -> None:
+    base_logger = logging.getLogger('alrin')
+    base_logger.setLevel(logging.DEBUG if verbose else logging.INFO)
+    base_logger.addHandler(AlrinLoggerHandler())

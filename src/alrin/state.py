@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from viat import ViatVault
 
-    from alrin.logging import AlrinLogger
     from alrin.resolver import AlrinPathResolver
 
 
@@ -13,4 +12,3 @@ if TYPE_CHECKING:
 class AlrinSharedState:
     vault: ViatVault
     resolver: AlrinPathResolver
-    logger: AlrinLogger

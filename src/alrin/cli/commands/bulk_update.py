@@ -1,7 +1,10 @@
+import logging
+
 import click
 
 from alrin.buildinfo import AlrinBuiltPackage
 from alrin.exceptions import AlrinPackageMetadataError
+from alrin.logging import setup_logging
 from alrin.source import AlrinPackageSource
 from alrin.workflow import (
     alpmdb_add_packages,
@@ -16,9 +19,13 @@ from alrin.workflow import (
 from .group import AlrinSharedState, alrin
 
 
+logger = logging.getLogger(__name__)
+
+
 @alrin.command()
 @click.pass_obj
 def bulk_update(shared: AlrinSharedState) -> None:
+    setup_logging()
     updated = list[AlrinPackageSource]()
 
     for pkg_path in shared.vault.tracker.iter_paths():
@@ -29,16 +36,16 @@ def bulk_update(shared: AlrinSharedState) -> None:
         preprocess_pkgbuild(pkg)
 
         if pkg.version == pkg.viat_meta.version:
-            shared.logger.info(f'Package {pkgname!r} is up-to-date.')
+            pkg.bound_logger.info('Package is up-to-date.')
             clean_worktree(pkg)
             continue
 
-        shared.logger.info(f'Rebuilding updated package {pkgname!r}.')
+        pkg.bound_logger.info('Rebuilding updated package.')
 
         try:
             makepkg_inside_jail(pkg)
         except AlrinPackageMetadataError as err:
-            shared.logger.error(f'Error building {pkgname!r}.')  # noqa: TRY400
+            pkg.bound_logger.error('Build error.')  # noqa: TRY400
 
             if click.confirm('Abort?', default=True):
                 raise click.ClickException('Update aborted') from err
@@ -57,4 +64,4 @@ def bulk_update(shared: AlrinSharedState) -> None:
     if len(updated) > 0:
         alpmdb_add_packages(shared, dest_files)
     else:
-        shared.logger.info('No package updates')
+        logger.info('No package updates.')

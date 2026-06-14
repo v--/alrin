@@ -1,3 +1,4 @@
+import logging
 from typing import TYPE_CHECKING
 
 import pygit2
@@ -16,10 +17,14 @@ if TYPE_CHECKING:
     from alrin.state import AlrinSharedState
 
 
+logger = logging.getLogger(__name__)
+
+
 class AlrinPackageSource:
     shared: AlrinSharedState
     pkgname: str
 
+    bound_logger: logging.LoggerAdapter
     repo: pygit2.Repository
     version: AlrinPackageVersion
     viat_meta: AlrinMetadata
@@ -27,6 +32,7 @@ class AlrinPackageSource:
     def __init__(self, shared: AlrinSharedState, pkgname: str) -> None:
         self.shared = shared
         self.pkgname = pkgname
+        self.bound_logger = logging.LoggerAdapter(logger, dict(subject=pkgname))
         pkg_path = self.get_abs_path()
 
         if not shared.vault.tracker.is_tracked(pkg_path):
@@ -46,13 +52,13 @@ class AlrinPackageSource:
         try:
             self.version = AlrinPackageVersion.from_srcinfo(self.read_srcinfo())
         except SourceInfoError:
-            shared.logger.info(f'Could not read .SRCINFO for {pkgname!r}. Using PKGBUILD instead.')
+            self.bound_logger.info('Could not read .SRCINFO. Using PKGBUILD instead.')
 
             with self.get_abs_path().joinpath('PKGBUILD').open() as file:
                 self.version = extract_pkgbuild_version(file)
 
     def get_abs_path(self) -> pathlib.Path:
-        return self.shared.resolver.pkg_get(self.pkgname)
+        return self.shared.resolver.get_pkg(self.pkgname)
 
     def get_rel_path(self) -> pathlib.Path:
         return self.shared.vault.resolver.relativize(self.get_abs_path())

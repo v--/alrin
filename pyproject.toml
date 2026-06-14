@@ -16,7 +16,7 @@ classifiers = [
 
 dependencies = [
   "click (>=8)",
-  "colorlog (>=6)",
+  "colorlog (>=6.8)",
   "pygit2 (>=1.19)",
   "viat (>=0.10.4)",
   "python-gnupg (>=0.5.6)",
