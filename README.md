@@ -1,6 +1,6 @@
-# Alrin (Arch Linux repository for ivasilev.net)
+# Alrin
 
-This is a bunch of code that grew out of me managing [my](https://ivasilev.net/pacman) [pacman](https://pacman.archlinux.page/)/[ALPM](https://alpm.archlinux.page/) repository.
+Alrin (**A**rch **L**inux **r**epository for [**i**vasilev.**n**et](https://ivasilev.net)) is a bunch of code that grew out of me managing [my](https://ivasilev.net/pacman) [pacman](https://pacman.archlinux.page/)/[ALPM](https://alpm.archlinux.page/) repository.
 
 In short, this tool needs a repository for managing state, say `alrin-state`, determined by the `ALRIN_STATE_REPO` environment variable or the working directory as a fallback. Packages with `PKGBUILD`/`.SRCINFO` files are stored as git submodules in `alrin-state/pkgbuild`, which allows easily checking for updates by simply pulling. [Viat](https://github.com/v--/viat) is used to store versions and some other metadata --- see below.
 
