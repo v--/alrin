@@ -44,7 +44,7 @@ The [tricky job](https://stackoverflow.com/a/35743109/2756776) of removing a git
 alrin pkg-remove <package>
 ```
 
-There are two more commends --- see below.
+There are two more commands --- see below.
 
 ## Some examples
 
