@@ -85,3 +85,5 @@ builddate = 1781374235
 ```
 
 Here, `pkgbuild/mkinitcpio-growrootfs` is a symlink to `../ec2-packages/mkinitcpio-growrootfs`, where `ec2-packages` is [this repository](https://git.uplinklabs.net/steven/ec2-packages). The role of the `git_root` attribute should be obvious.
+
+There are some more supported attributes like `skip_pgp` (in case the PGP signatures have been verified independently) or `note` (for plain text notes).

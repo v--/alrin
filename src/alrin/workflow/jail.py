@@ -48,6 +48,13 @@ def makepkg_inside_jail(pkg: AlrinPackageSource, builddate: int | None = None) -
 
 
     pkg.bound_logger.info('Building inside jail.')
+    extra_args = list[str]()
+
+    if pkg.viat_meta.skip_pgp:
+        extra_args.append('--skippgpcheck')
+
+    if len(extra_args) > 0:
+        extra_args.insert(0, '--')
 
     try:
         subprocess.run(
@@ -57,6 +64,7 @@ def makepkg_inside_jail(pkg: AlrinPackageSource, builddate: int | None = None) -
                 '-r', jail_path.as_posix(),
                 '-l', 'build', # The directory to use as a working copy
                 'base-devel',
+                *extra_args,
             ],
             check=True,
             cwd=pkg.get_abs_path(),

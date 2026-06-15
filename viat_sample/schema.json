@@ -8,6 +8,7 @@
     "git_root": {"type": "string"},
     "extra_makedepends": {"type": "array", "elements": {"type": "string"}},
     "add_python_suffix": {"type": "boolean"},
+    "skip_pgp": {"type": "boolean"},
     "note": {"type":"string"}
   },
   "required": ["pkgrel", "pkgver"]
