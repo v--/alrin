@@ -1,14 +1,19 @@
 import ast
+import logging
 import re
 import sys
 from typing import TYPE_CHECKING, TextIO
 
 from alrin.exceptions import AlrinPackageMetadataError
+from alrin.logging import inject_subject
 from alrin.metadata import AlrinPackageVersion
 
 
 if TYPE_CHECKING:
     from alrin.source import AlrinPackageSource
+
+
+logger = logging.getLogger(__name__)
 
 
 def geneate_pkgbuild_regex(key: str) -> re.Pattern:
@@ -57,7 +62,9 @@ def preprocess_pkgbuild(pkg: AlrinPackageSource) -> None:
     pkgbuild_path = pkg.get_abs_path().joinpath('PKGBUILD')
 
     if pkg.viat_meta.extra_makedepends is not None:
-        pkg.bound_logger.info('Adding custom extra_makedepends list.')
+        with inject_subject(logger, pkg.pkgname):
+            logger.info('Adding custom extra_makedepends list.')
+
         pkgbuild = pkgbuild_path.read_text('utf-8')
         extra_makedepends = ' '.join(repr(dep) for dep in pkg.viat_meta.extra_makedepends)
 
@@ -80,7 +87,9 @@ def preprocess_pkgbuild(pkg: AlrinPackageSource) -> None:
     pkgrel = pkgbuild_version.pkgrel
 
     if not pkgrel.endswith(version_suffix):
-        pkg.bound_logger.info(f'Adding a pkgrel suffix {version_suffix}.')
+        with inject_subject(logger, pkg.pkgname):
+            logger.info(f'Adding a pkgrel suffix {version_suffix}.')
+
         pkgbuild_path.write_text(
             re.sub(r'(?<=pkgrel=).+', 'pkgrel=' + pkgrel + version_suffix, pkgbuild_path.read_text('utf-8')),
         )

@@ -3,6 +3,7 @@ import subprocess
 from typing import TYPE_CHECKING
 
 from alrin.exceptions import AlrinPackageMetadataError
+from alrin.logging import inject_subject
 
 
 if TYPE_CHECKING:
@@ -46,8 +47,9 @@ def makepkg_inside_jail(pkg: AlrinPackageSource, builddate: int | None = None) -
         except subprocess.CalledProcessError as err:
             raise AlrinPackageMetadataError('Jail creation failed') from err
 
+    with inject_subject(logger, pkg.pkgname):
+        logger.info('Building inside jail.')
 
-    pkg.bound_logger.info('Building inside jail.')
     extra_args = list[str]()
 
     if pkg.viat_meta.skip_pgp:

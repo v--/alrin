@@ -5,6 +5,7 @@ import pygit2
 from alpm.alpm_srcinfo import SourceInfoError, source_info_from_file
 
 from alrin.exceptions import AlrinPackageMetadataError
+from alrin.logging import inject_subject
 from alrin.metadata import AlrinMetadata, AlrinPackageVersion
 from alrin.workflow.pkgbuild import extract_pkgbuild_version
 
@@ -24,7 +25,6 @@ class AlrinPackageSource:
     shared: AlrinSharedState
     pkgname: str
 
-    bound_logger: logging.LoggerAdapter
     repo: pygit2.Repository
     version: AlrinPackageVersion
     viat_meta: AlrinMetadata
@@ -32,7 +32,6 @@ class AlrinPackageSource:
     def __init__(self, shared: AlrinSharedState, pkgname: str) -> None:
         self.shared = shared
         self.pkgname = pkgname
-        self.bound_logger = logging.LoggerAdapter(logger, dict(subject=pkgname))
         pkg_path = self.get_abs_path()
 
         if not shared.vault.tracker.is_tracked(pkg_path):
@@ -52,7 +51,8 @@ class AlrinPackageSource:
         try:
             self.version = AlrinPackageVersion.from_srcinfo(self.read_srcinfo())
         except SourceInfoError:
-            self.bound_logger.info('Could not read .SRCINFO. Using PKGBUILD instead.')
+            with inject_subject(logger, pkgname):
+                logger.info('Could not read .SRCINFO. Using PKGBUILD instead.')
 
             with self.get_abs_path().joinpath('PKGBUILD').open() as file:
                 self.version = extract_pkgbuild_version(file)

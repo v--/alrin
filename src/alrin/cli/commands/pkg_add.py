@@ -6,7 +6,7 @@ import pygit2
 from alpm.alpm_srcinfo import SourceInfoError, source_info_from_file
 
 from alrin.exceptions import AlrinPackageMetadataError
-from alrin.logging import setup_logging
+from alrin.logging import bind_logger_to_subject, setup_logging
 from alrin.resolver import AlrinPathResolver
 from alrin.source import AlrinPackageSource
 from alrin.workflow import (
@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 @alrin.command()
 @click.argument('pkgname')
 @click.pass_obj
+@bind_logger_to_subject(logger, lambda _, pkgname: pkgname)
 def pkg_add(shared: AlrinSharedState, pkgname: str) -> None:
     setup_logging()
 
@@ -40,14 +41,13 @@ def pkg_add(shared: AlrinSharedState, pkgname: str) -> None:
     if pkg_path.exists():
         raise AlrinPackageMetadataError(f'Directory at {rel_path.as_posix()!r} already exists')
 
-    bound_logger = logging.LoggerAdapter(logger, extra=dict(subject=pkgname))
-    bound_logger.info(f'Adding {url} as a submodule into {rel_path.as_posix()!r}.')
+    logger.info(f'Adding {url} as a submodule into {rel_path.as_posix()!r}.')
     root_repo = pygit2.Repository(shared.resolver.get_root())
 
     try:
         root_repo.submodules.add(url, rel_path.as_posix())
     except pygit2.GitError as err:
-        bound_logger.error(f'Removing invalid repository from {rel_path.as_posix()!r}.')  # noqa: TRY400
+        logger.error(f'Removing invalid repository from {rel_path.as_posix()!r}.')  # noqa: TRY400
         shutil.rmtree(rel_path)
         unregister_submodule(shared, pkgname)
         raise AlrinPackageMetadataError(f'Invalid git repository at {url!r}') from err
@@ -55,12 +55,12 @@ def pkg_add(shared: AlrinSharedState, pkgname: str) -> None:
     try:
         srcinfo = source_info_from_file(pkg_path.joinpath('.SRCINFO'))
     except SourceInfoError as err:
-        bound_logger.error(f'Removing invalid repository from {rel_path.as_posix()!r}.')  # noqa: TRY400
+        logger.error(f'Removing invalid repository from {rel_path.as_posix()!r}.')  # noqa: TRY400
         shutil.rmtree(rel_path)
         unregister_submodule(shared, pkgname)
         raise AlrinPackageMetadataError(f'Could not read .SRCINFO at {rel_path.as_posix()!r}') from err
 
-    bound_logger.info('Adding mock Viat metadata.')
+    logger.info('Adding mock Viat metadata.')
     with shared.vault.storage as conn, conn.get_mutator(pkg_path) as mut:
         mut['pkgver'] = '0'
         mut['pkgrel'] = '0'
@@ -68,7 +68,7 @@ def pkg_add(shared: AlrinSharedState, pkgname: str) -> None:
         if any(str(dep) == 'python' for dep in srcinfo.base.dependencies) and click.confirm('Mark as Python package?', True):
             mut['add_python_suffix'] = True
 
-    bound_logger.info('Building.')
+    logger.info('Building.')
     pkg = AlrinPackageSource(shared, pkgname)
     preprocess_pkgbuild(pkg)
     makepkg_inside_jail(pkg)

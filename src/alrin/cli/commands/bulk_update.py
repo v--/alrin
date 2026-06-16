@@ -4,7 +4,7 @@ import click
 
 from alrin.buildinfo import AlrinBuiltPackage
 from alrin.exceptions import AlrinPackageMetadataError
-from alrin.logging import setup_logging
+from alrin.logging import inject_subject, setup_logging
 from alrin.source import AlrinPackageSource
 from alrin.workflow import (
     alpmdb_add_packages,
@@ -29,28 +29,28 @@ def bulk_update(shared: AlrinSharedState) -> None:
     updated = list[AlrinPackageSource]()
 
     for pkg_path in shared.vault.tracker.iter_paths():
-        pkgname = pkg_path.name
-        pkg = AlrinPackageSource(shared, pkgname)
+        pkg = AlrinPackageSource(shared, pkg_path.name)
 
-        update_repo(pkg)
-        preprocess_pkgbuild(pkg)
+        with inject_subject(logger, pkg_path.name):
+            update_repo(pkg)
+            preprocess_pkgbuild(pkg)
 
-        if pkg.version == pkg.viat_meta.version:
-            pkg.bound_logger.info('Package is up-to-date.')
-            clean_worktree(pkg)
-            continue
+            if pkg.version == pkg.viat_meta.version:
+                logger.info('Package is up-to-date.')
+                clean_worktree(pkg)
+                continue
 
-        pkg.bound_logger.info('Rebuilding updated package.')
+            logger.info('Rebuilding updated package.')
 
-        try:
-            makepkg_inside_jail(pkg)
-        except AlrinPackageMetadataError as err:
-            pkg.bound_logger.error('Build error.')  # noqa: TRY400
+            try:
+                makepkg_inside_jail(pkg)
+            except AlrinPackageMetadataError as err:
+                logger.error('Build error.')  # noqa: TRY400
 
-            if click.confirm('Abort?', default=True):
-                raise click.ClickException('Update aborted') from err
-        else:
-            updated.append(pkg)
+                if click.confirm('Abort?', default=True):
+                    raise click.ClickException('Update aborted') from err
+            else:
+                updated.append(pkg)
 
     dest_files = list[AlrinBuiltPackage]()
 
