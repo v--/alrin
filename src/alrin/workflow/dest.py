@@ -37,7 +37,7 @@ def process_built_files(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
         try:
             new = next(built for built in built_files if built.info.pkgname == existing.info.pkgname and built.info.pkgarch == existing.info.pkgarch)
         except StopIteration:
-            logger.warn(f'Package file {existing.path.name} exists in the destination, but not in the newly built files.')
+            logger.warning(f'Package file {existing.path.name} exists in the destination, but not in the newly built files.')
 
             if click.confirm(f'Remove {existing_rel}?', True):
                 remove_built_file(existing)
@@ -53,7 +53,7 @@ def process_built_files(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
             if old_hash == new_hash:
                 logger.info(f'Package file {existing.path.name} has not changed.')
             else:
-                logger.warn(f'Package file {existing.path.name} rebuilt with the same version, but is different from the old one.')
+                logger.warning(f'Package file {existing.path.name} rebuilt with the same version, but is different from the old one.')
 
             if click.confirm(f'Replace the existing {existing_rel.as_posix()!s}?', False):
                 remove_built_file(existing)
@@ -76,7 +76,7 @@ def process_built_files(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
             builddate = built.info.builddate
             builddate_pkg_name = built.path.name
         elif built.info.builddate != builddate:
-            logger.warn(
+            logger.warning(
                 f'{builddate_pkg_name} and {built.path.name} have different build dates: {built.info.builddate} and {builddate}.',
             )
 
