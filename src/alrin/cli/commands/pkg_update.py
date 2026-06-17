@@ -23,10 +23,11 @@ logger = logging.getLogger(__name__)
 
 @alrin.command()
 @click.argument('pkgname')
+@click.option('-v', '--verbose', is_flag=True)
 @click.pass_obj
 @bind_logger_to_subject(logger, lambda _, pkgname: pkgname)
-def pkg_update(shared: AlrinSharedState, pkgname: str) -> None:
-    setup_logging()
+def pkg_update(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
+    setup_logging(shared.verbose_logging or verbose)
 
     pkg = AlrinPackageSource(shared, pkgname)
     update_repo(pkg)

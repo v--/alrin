@@ -17,9 +17,10 @@ from .group import AlrinSharedState, alrin
 
 @alrin.command()
 @click.argument('pkgname')
+@click.option('-v', '--verbose', is_flag=True)
 @click.pass_obj
-def pkg_rebuild(shared: AlrinSharedState, pkgname: str) -> None:
-    setup_logging()
+def pkg_rebuild(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
+    setup_logging(shared.verbose_logging or verbose)
 
     pkg = AlrinPackageSource(shared, pkgname)
 

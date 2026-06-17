@@ -24,9 +24,9 @@ def with_cli_exception_handler() -> Generator[None]:
 
 
 @click.group()
-@click.version_option()
 @click.pass_context
-def alrin(ctx: click.Context) -> None:
+@click.option('-v', '--verbose', is_flag=True)
+def alrin(ctx: click.Context, verbose: bool) -> None:
     with with_cli_exception_handler():
         vault = ViatVault(
             locate_existing_vault_root(
@@ -37,6 +37,7 @@ def alrin(ctx: click.Context) -> None:
     ctx.obj = AlrinSharedState(
         vault,
         AlrinPathResolver(vault),
+        verbose_logging=verbose,
     )
 
     ctx.with_resource(with_cli_exception_handler())

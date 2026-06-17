@@ -23,9 +23,10 @@ logger = logging.getLogger(__name__)
 
 
 @alrin.command()
+@click.option('-v', '--verbose', is_flag=True)
 @click.pass_obj
-def bulk_update(shared: AlrinSharedState) -> None:
-    setup_logging()
+def bulk_update(shared: AlrinSharedState, verbose: bool) -> None:
+    setup_logging(shared.verbose_logging or verbose)
     updated = list[AlrinPackageSource]()
 
     for pkg_path in shared.vault.tracker.iter_paths():

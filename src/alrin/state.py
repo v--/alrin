@@ -9,3 +9,4 @@ lazy from alrin.resolver import AlrinPathResolver
 class AlrinSharedState:
     vault: ViatVault
     resolver: AlrinPathResolver
+    verbose_logging: bool

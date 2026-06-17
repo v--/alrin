@@ -16,10 +16,11 @@ logger = logging.getLogger(__name__)
 
 @alrin.command()
 @click.argument('pkgname')
+@click.option('-v', '--verbose', is_flag=True)
 @click.pass_obj
 @bind_logger_to_subject(logger, lambda _, pkgname: pkgname)
-def pkg_remove(shared: AlrinSharedState, pkgname: str) -> None:
-    setup_logging()
+def pkg_remove(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
+    setup_logging(shared.verbose_logging or verbose)
 
     resolver = AlrinPathResolver(shared.vault)
     pkg_path = resolver.get_pkg(pkgname)
