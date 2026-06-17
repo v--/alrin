@@ -88,7 +88,7 @@ def preprocess_pkgbuild(pkg: AlrinPackageSource) -> None:
             logger.info(f'Adding a pkgrel suffix {version_suffix}.')
 
         pkgbuild_path.write_text(
-            re.sub(r'(?<=pkgrel=).+', 'pkgrel=' + pkgrel + version_suffix, pkgbuild_path.read_text('utf-8')),
+            re.sub(r'pkgrel=.+', 'pkgrel=' + pkgrel + version_suffix, pkgbuild_path.read_text('utf-8')),
         )
 
         pkgrel += version_suffix
