@@ -43,7 +43,7 @@ def alpmdb_add_packages(
                     *package_paths,
                 ],
                 check=True,
-                cwd=shared.resolver.get_dest(),
+                cwd=dest,
             )
         except subprocess.CalledProcessError as err:
             raise AlrinPackageMetadataError('Repository update failed') from err

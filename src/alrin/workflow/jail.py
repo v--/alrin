@@ -11,6 +11,14 @@ logger = logging.getLogger(__name__)
 
 def makepkg_inside_jail(pkg: AlrinPackageSource, builddate: int | None = None) -> None:
     jail_path = pkg.shared.resolver.get_jail()
+    pacman_conf_src = pkg.shared.resolver.get_root().joinpath('pacman.conf')
+
+    # This variable will get reused
+    extra_args = list[str]()
+
+    if pacman_conf_src.exists():
+        logger.debug('Synchronizing pacman.conf.')
+        extra_args = ['-C', pacman_conf_src.as_posix()]
 
     if jail_path.exists():
         logger.info('Preparing existing jail.')
@@ -18,10 +26,11 @@ def makepkg_inside_jail(pkg: AlrinPackageSource, builddate: int | None = None) -
         try:
             subprocess.run(
                 [
-                    'arch-nspawn', jail_path.joinpath('root').as_posix(),
+                    'arch-nspawn', *extra_args, jail_path.joinpath('root').as_posix(),
                     'pacman', '--sync', '--refresh', '--sysupgrade',
                 ],
                 check=True,
+                cwd=pkg.shared.resolver.get_dest(),
             )
         except subprocess.CalledProcessError as err:
             raise AlrinPackageMetadataError('Jail update failed') from err
@@ -33,8 +42,7 @@ def makepkg_inside_jail(pkg: AlrinPackageSource, builddate: int | None = None) -
             subprocess.run(
                 [
                     'mkarchroot',
-                    '-C', '/etc/pacman.conf',
-                    '-f', '/etc/pacman.d/mirrorlist.custom:/etc/pacman.d/mirrorlist.custom',
+                    *extra_args,
                     jail_path.joinpath('root').as_posix(),
                     'base-devel',
                 ],
@@ -46,13 +54,10 @@ def makepkg_inside_jail(pkg: AlrinPackageSource, builddate: int | None = None) -
     with inject_subject(logger, pkg.pkgname):
         logger.info('Building inside jail.')
 
-    extra_args = list[str]()
+    extra_args = []
 
     if pkg.viat_meta.skip_pgp:
-        extra_args.append('--skippgpcheck')
-
-    if len(extra_args) > 0:
-        extra_args.insert(0, '--')
+        extra_args = ['--', '--skippgpcheck']
 
     try:
         subprocess.run(

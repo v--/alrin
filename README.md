@@ -26,6 +26,8 @@ cd $ALRIN_STATE_REPO
 git init
 ```
 
+You can optionally copy or symlink a `pacman.conf` file in `$ALRIN_STATE_REPO` and it will get synchronized before very build.
+
 The following can then register `<package>` from the AUR:
 
 ```shell
