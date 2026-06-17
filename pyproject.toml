@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "Arch Linux repository for ivasilev.net"
 license = "Unlicense"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.15"
 
 authors = [
   { name = "Ianis Vasilev", email = "ianis@ivasilev.net" }
@@ -48,6 +48,7 @@ extend = ".venv/share/ruff/ruff.ivasilev.toml"
 [tool.ruff.lint]
 ignore = [
   "D1",      # undocumented-*
+  "TC001", "TC002", "TC003", # typing-only-*-import (we prefer lazy imports to `if TYPE_CHECKING` blocks)
 ]
 
 # mypy
