@@ -1,21 +1,16 @@
 import contextlib
 import hashlib
 import logging
-from typing import TYPE_CHECKING
+lazy from collections.abc import Sequence
 
 import click
 
 from alrin.buildinfo import AlrinBuiltPackage, get_existing_built, get_newly_built
 from alrin.logging import bind_logger_to_subject
 from alrin.metadata import AlrinMetadata
+lazy from alrin.source import AlrinPackageSource
 
 from .signing import create_signature_file
-
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from alrin.source import AlrinPackageSource
 
 
 logger = logging.getLogger(__name__)

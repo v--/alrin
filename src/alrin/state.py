@@ -1,11 +1,8 @@
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
+lazy from viat import ViatVault
 
-if TYPE_CHECKING:
-    from viat import ViatVault
-
-    from alrin.resolver import AlrinPathResolver
+lazy from alrin.resolver import AlrinPathResolver
 
 
 @dataclass(frozen=True)

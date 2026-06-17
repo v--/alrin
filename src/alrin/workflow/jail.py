@@ -1,13 +1,9 @@
 import logging
 import subprocess
-from typing import TYPE_CHECKING
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import inject_subject
-
-
-if TYPE_CHECKING:
-    from alrin.source import AlrinPackageSource
+lazy from alrin.source import AlrinPackageSource
 
 
 logger = logging.getLogger(__name__)

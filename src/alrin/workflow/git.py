@@ -2,18 +2,13 @@ import contextlib
 import logging
 import shutil
 import subprocess
-from typing import TYPE_CHECKING
 
 import pygit2
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import bind_logger_to_subject
-
-
-if TYPE_CHECKING:
-
-    from alrin.source import AlrinPackageSource
-    from alrin.state import AlrinSharedState
+lazy from alrin.source import AlrinPackageSource
+lazy from alrin.state import AlrinSharedState
 
 
 logger = logging.getLogger(__name__)

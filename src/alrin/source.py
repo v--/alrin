@@ -1,21 +1,15 @@
 import logging
-from typing import TYPE_CHECKING
+lazy import pathlib
 
 import pygit2
 from alpm.alpm_srcinfo import SourceInfoError, source_info_from_file
+lazy from alpm.type_aliases import SourceInfo
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import inject_subject
 from alrin.metadata import AlrinMetadata, AlrinPackageVersion
 from alrin.workflow.pkgbuild import extract_pkgbuild_version
-
-
-if TYPE_CHECKING:
-    import pathlib
-
-    from alpm.type_aliases import SourceInfo
-
-    from alrin.state import AlrinSharedState
+lazy from alrin.state import AlrinSharedState
 
 
 logger = logging.getLogger(__name__)

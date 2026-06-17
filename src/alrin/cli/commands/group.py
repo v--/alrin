@@ -1,7 +1,7 @@
 import contextlib
 import os
 import pathlib
-from typing import TYPE_CHECKING
+lazy from collections.abc import Generator
 
 import click
 from viat import ViatError, ViatVault
@@ -10,10 +10,6 @@ from viat.vault import locate_existing_vault_root
 from alrin.exceptions import AlrinPackageError
 from alrin.resolver import AlrinPathResolver
 from alrin.state import AlrinSharedState
-
-
-if TYPE_CHECKING:
-    from collections.abc import Generator
 
 
 @contextlib.contextmanager

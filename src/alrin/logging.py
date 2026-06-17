@@ -2,13 +2,9 @@ import contextlib
 import functools
 import logging
 import sys
-from typing import TYPE_CHECKING
+lazy from collections.abc import Callable, Generator
 
 import colorlog
-
-
-if TYPE_CHECKING:
-    from collections.abc import Callable, Generator
 
 
 class AlrinLoggerHandler(logging.StreamHandler):

@@ -1,10 +1,7 @@
-from typing import TYPE_CHECKING
+
+lazy import pathlib
 
 import gnupg
-
-
-if TYPE_CHECKING:
-    import pathlib
 
 
 def create_signature_file(path: pathlib.Path) -> None:

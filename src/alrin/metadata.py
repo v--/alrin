@@ -1,13 +1,10 @@
 import functools
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, cast
+from typing import Self, cast
+lazy from collections.abc import Sequence
 
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from alpm.type_aliases import SourceInfo
-    from viat.support.json import JsonObjectT
+lazy from alpm.type_aliases import SourceInfo
+lazy from viat.support.json import JsonObjectT
 
 
 @dataclass(frozen=True)

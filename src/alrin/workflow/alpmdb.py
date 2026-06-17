@@ -1,15 +1,10 @@
 import logging
 import subprocess
-from typing import TYPE_CHECKING
+lazy from collections.abc import Sequence
 
 from alrin.buildinfo import AlrinBuiltPackage, get_existing_built
 from alrin.exceptions import AlrinPackageMetadataError
-
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from alrin.state import AlrinSharedState
+lazy from alrin.state import AlrinSharedState
 
 
 DEFAULT_REPOSITORY_NAME = 'ivasilev'

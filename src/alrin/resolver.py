@@ -1,11 +1,7 @@
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+lazy import pathlib
 
-
-if TYPE_CHECKING:
-    import pathlib
-
-    from viat import ViatVault
+lazy from viat import ViatVault
 
 
 @dataclass(frozen=True)

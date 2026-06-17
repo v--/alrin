@@ -2,15 +2,12 @@ import ast
 import logging
 import re
 import sys
-from typing import TYPE_CHECKING, TextIO
+from typing import TextIO
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import inject_subject
 from alrin.metadata import AlrinPackageVersion
-
-
-if TYPE_CHECKING:
-    from alrin.source import AlrinPackageSource
+lazy from alrin.source import AlrinPackageSource
 
 
 logger = logging.getLogger(__name__)
