@@ -30,7 +30,7 @@ def pkg_remove(shared: AlrinSharedState, pkgname: str) -> None:
 
     if pkg_path.exists():
         rel_path = resolver.relativize(pkg_path)
-        logger.info(f'Removing {rel_path.as_posix()!r}.')
+        logger.info(f'Removing {rel_path}.')
         shutil.rmtree(pkg_path)
 
     with shared.vault.storage as conn, conn.get_mutator(pkg_path) as mut:

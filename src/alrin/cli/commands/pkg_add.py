@@ -39,15 +39,15 @@ def pkg_add(shared: AlrinSharedState, pkgname: str) -> None:
     rel_path = resolver.relativize(pkg_path)
 
     if pkg_path.exists():
-        raise AlrinPackageMetadataError(f'Directory at {rel_path.as_posix()!r} already exists')
+        raise AlrinPackageMetadataError(f'Directory at {rel_path} already exists')
 
-    logger.info(f'Adding {url} as a submodule into {rel_path.as_posix()!r}.')
+    logger.info(f'Adding {url} as a submodule into {rel_path}.')
     root_repo = pygit2.Repository(shared.resolver.get_root())
 
     try:
         root_repo.submodules.add(url, rel_path.as_posix())
     except pygit2.GitError as err:
-        logger.error(f'Removing invalid repository from {rel_path.as_posix()!r}.')  # noqa: TRY400
+        logger.error(f'Removing invalid repository from {rel_path}.')  # noqa: TRY400
         shutil.rmtree(rel_path)
         unregister_submodule(shared, pkgname)
         raise AlrinPackageMetadataError(f'Invalid git repository at {url!r}') from err
@@ -55,10 +55,10 @@ def pkg_add(shared: AlrinSharedState, pkgname: str) -> None:
     try:
         srcinfo = source_info_from_file(pkg_path.joinpath('.SRCINFO'))
     except SourceInfoError as err:
-        logger.error(f'Removing invalid repository from {rel_path.as_posix()!r}.')  # noqa: TRY400
+        logger.error(f'Removing invalid repository from {rel_path}.')  # noqa: TRY400
         shutil.rmtree(rel_path)
         unregister_submodule(shared, pkgname)
-        raise AlrinPackageMetadataError(f'Could not read .SRCINFO at {rel_path.as_posix()!r}') from err
+        raise AlrinPackageMetadataError(f'Could not read .SRCINFO at {rel_path}') from err
 
     logger.info('Adding mock Viat metadata.')
     with shared.vault.storage as conn, conn.get_mutator(pkg_path) as mut:

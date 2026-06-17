@@ -29,7 +29,7 @@ class AlrinPackageSource:
         pkg_path = self.get_abs_path()
 
         if not shared.vault.tracker.is_tracked(pkg_path):
-            raise AlrinPackageMetadataError(f'Unrecognized package name {pkgname!r}')
+            raise AlrinPackageMetadataError(f'Unrecognized package name {pkgname}')
 
         with shared.vault.storage as conn, conn.get_reader(pkg_path) as reader:
             self.viat_meta = AlrinMetadata.from_json(reader)
@@ -40,7 +40,7 @@ class AlrinPackageSource:
             self.repo = pygit2.Repository(pkg_path)
         except pygit2.GitError as err:
             git_rel_path = shared.resolver.relativize(git_path)
-            raise AlrinPackageMetadataError(f'Path {git_rel_path.as_posix()!r} is not a valid git repository') from err
+            raise AlrinPackageMetadataError(f'Path {git_rel_path} is not a valid git repository') from err
 
         try:
             self.version = AlrinPackageVersion.from_srcinfo(self.read_srcinfo())

@@ -37,9 +37,9 @@ def process_built_files(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
         try:
             new = next(built for built in built_files if built.info.pkgname == existing.info.pkgname and built.info.pkgarch == existing.info.pkgarch)
         except StopIteration:
-            logger.warn(f'Package file {existing.path.name!r} exists in the destination, but not in the newly built files.')
+            logger.warn(f'Package file {existing.path.name} exists in the destination, but not in the newly built files.')
 
-            if click.confirm(f'Remove {existing_rel.as_posix()!s}?', True):
+            if click.confirm(f'Remove {existing_rel}?', True):
                 remove_built_file(existing)
             else:
                 ignored_files.add(new)
@@ -51,9 +51,9 @@ def process_built_files(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
             new_hash = hashlib.md5(new.path.read_bytes()).hexdigest()
 
             if old_hash == new_hash:
-                logger.info(f'Package file {existing.path.name!r} has not changed.')
+                logger.info(f'Package file {existing.path.name} has not changed.')
             else:
-                logger.warn(f'Package file {existing.path.name!r} rebuilt with the same version, but is different from the old one.')
+                logger.warn(f'Package file {existing.path.name} rebuilt with the same version, but is different from the old one.')
 
             if click.confirm(f'Replace the existing {existing_rel.as_posix()!s}?', False):
                 remove_built_file(existing)
@@ -77,14 +77,14 @@ def process_built_files(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
             builddate_pkg_name = built.path.name
         elif built.info.builddate != builddate:
             logger.warn(
-                f'{builddate_pkg_name!r} and {built.path.name!r} have different build dates: {built.info.builddate} and {builddate}.',
+                f'{builddate_pkg_name} and {built.path.name} have different build dates: {built.info.builddate} and {builddate}.',
             )
 
-        logger.info(f'Signing {built.path.name!r}.')
+        logger.info(f'Signing {built.path.name}.')
         create_signature_file(built.path)
 
         for arch in built.iter_arch():
-            logger.info(f'Copying {built.path.name!r} for architecture {arch!r}.')
+            logger.info(f'Copying {built.path.name} for architecture {arch}.')
 
             dest_path = pkg.shared.resolver.get_dest()
             arch_path = dest_path / arch

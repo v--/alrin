@@ -34,7 +34,7 @@ def alpmdb_add_packages(
             continue
 
         db_name = f'{arch}/{repo_name}.db.tar.zst'
-        logger.info(f'Adding {pkg_len} {'package' if pkg_len == 1 else 'packages'} to {db_name!r}.')
+        logger.info(f'Adding {pkg_len} {'package' if pkg_len == 1 else 'packages'} to {db_name}.')
 
         try:
             subprocess.run(
@@ -65,7 +65,7 @@ def alpmdb_remove_packages(
 
         pkg_len = len(package_names)
         db_name = f'{arch}/{repo_name}.db.tar.zst'
-        logger.info(f'Removing {pkg_len} {'package' if pkg_len == 1 else 'packages'} from {db_name!r}.')
+        logger.info(f'Removing {pkg_len} {'package' if pkg_len == 1 else 'packages'} from {db_name}.')
 
         try:
             subprocess.run(

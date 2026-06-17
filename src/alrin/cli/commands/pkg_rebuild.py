@@ -29,7 +29,7 @@ def pkg_rebuild(shared: AlrinSharedState, pkgname: str) -> None:
     postprocess_pkgbuild(pkg)
 
     if pkg.version > pkg.viat_meta.version:
-        raise AlrinPackageMetadataError(f'Package {pkgname!r} has dynamically updated its version and needs to be properly updated')
+        raise AlrinPackageMetadataError(f'Package {pkgname} has dynamically updated its version and needs to be properly updated')
 
     dest_files = process_built_files(pkg)
     clean_worktree(pkg)

@@ -44,7 +44,7 @@ def extract_buildinfo(pkg_path: pathlib.Path) -> AlrinBuildInfo:
         buildinfo = file.extractfile('.BUILDINFO')
 
         if buildinfo is None:
-            raise AlrinPackageMetadataError(f'No .BUILDINFO file in {pkg_path.as_posix()!r}')
+            raise AlrinPackageMetadataError(f'No .BUILDINFO file in {pkg_path}')
 
         while line := buildinfo.readline():
             key, value = map(str.strip, line.decode(encoding='utf-8').split('=', maxsplit=2))
@@ -54,7 +54,7 @@ def extract_buildinfo(pkg_path: pathlib.Path) -> AlrinBuildInfo:
 
     for key in hints:
         if key not in fields:
-            raise AlrinPackageMetadataError(f'Could not read {key!r} from {pkg_path.as_posix()!r}')
+            raise AlrinPackageMetadataError(f'Could not read {key!r} from {pkg_path}')
 
     builddate = int(fields.pop('builddate'))
     return AlrinBuildInfo(**fields, builddate=builddate)
