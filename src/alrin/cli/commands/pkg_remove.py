@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 @click.argument('pkgname')
 @click.option('-v', '--verbose', is_flag=True)
 @click.pass_obj
-@bind_logger_to_subject(logger, lambda _, pkgname: pkgname)
+@bind_logger_to_subject(logger, lambda shared, pkgname, verbose: pkgname)  # noqa: ARG005
 def pkg_remove(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
     setup_logging(shared.verbose_logging or verbose)
 
