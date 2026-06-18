@@ -71,9 +71,10 @@ def unregister_submodule(shared: AlrinSharedState, pkgname: str) -> None:
 
     logger.info('Unregistering git submodule.')
     with contextlib.suppress(subprocess.CalledProcessError):
+        # git submodule deinit doesn't work here fore some reason
         subprocess.run(
             [
-                'git', 'submodule', 'deinit', '--force', raw_path,
+                'git', 'config', '--file', '.git/config', '--remove-section', f'submodule.{raw_path}',
             ],
             check=True,
             cwd=root_path,
