@@ -10,6 +10,7 @@ from alrin.metadata import AlrinPackageVersion
 lazy from alrin.source import AlrinPackageSource
 
 
+PYTHON_VERSION_SUFFIX = f'.{sys.version_info.major}{sys.version_info.minor}'
 logger = logging.getLogger(__name__)
 
 
@@ -74,24 +75,20 @@ def preprocess_pkgbuild(pkg: AlrinPackageSource) -> None:
                 'makedepends=(' + extra_makedepends + ')\n' + pkgbuild,
             )
 
-    if not pkg.viat_meta.add_python_suffix:
-        return
-
     with pkg.get_abs_path().joinpath('PKGBUILD').open() as file:
         pkgbuild_version = extract_pkgbuild_version(file)
 
-    version_suffix = f'.{sys.version_info.major}{sys.version_info.minor}'
     pkgrel = pkgbuild_version.pkgrel
 
-    if not pkgrel.endswith(version_suffix):
+    if pkg.viat_meta.add_python_suffix and not pkgrel.endswith(PYTHON_VERSION_SUFFIX):
         with inject_subject(logger, pkg.pkgname):
-            logger.info(f'Adding a pkgrel suffix {version_suffix}.')
+            logger.info(f'Adding a pkgrel suffix {PYTHON_VERSION_SUFFIX}.')
 
         pkgbuild_path.write_text(
-            re.sub(r'pkgrel=.+', 'pkgrel=' + pkgrel + version_suffix, pkgbuild_path.read_text('utf-8')),
+            re.sub(r'pkgrel=.+', 'pkgrel=' + pkgrel + PYTHON_VERSION_SUFFIX, pkgbuild_path.read_text('utf-8')),
         )
 
-        pkgrel += version_suffix
+        pkgrel += PYTHON_VERSION_SUFFIX
 
     pkg.version = AlrinPackageVersion(
         pkgver=pkgbuild_version.pkgver,
