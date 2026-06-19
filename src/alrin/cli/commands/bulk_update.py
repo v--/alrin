@@ -46,7 +46,8 @@ def bulk_update(shared: AlrinSharedState, verbose: bool) -> None:
             try:
                 makepkg_inside_jail(pkg)
             except AlrinPackageMetadataError as err:
-                logger.error('Build error.')  # noqa: TRY400
+                # ruff: ignore[error-instead-of-exception]
+                logger.error('Build error.')
 
                 if click.confirm('Abort?', default=True):
                     raise click.ClickException('Update aborted') from err

@@ -45,6 +45,7 @@ resolution = "lowest-direct"
 # ruff
 [tool.ruff]
 extend = ".venv/share/ruff/ruff.ivasilev.toml"
+preview = true
 
 [tool.ruff.lint]
 ignore = [

@@ -30,7 +30,8 @@ logger = logging.getLogger(__name__)
 @click.argument('pkgname')
 @click.option('-v', '--verbose', is_flag=True)
 @click.pass_obj
-@bind_logger_to_subject(logger, lambda shared, pkgname, verbose: pkgname)  # noqa: ARG005
+# ruff: ignore[unused-lambda-argument]
+@bind_logger_to_subject(logger, lambda shared, pkgname, verbose: pkgname)
 def pkg_add(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
     setup_logging(shared.verbose_logging or verbose)
 
@@ -48,7 +49,8 @@ def pkg_add(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
     try:
         root_repo.submodules.add(url, rel_path.as_posix())
     except pygit2.GitError as err:
-        logger.error(f'Removing invalid repository from {rel_path}.')  # noqa: TRY400
+        logger.exception('Git error')
+        logger.info(f'Removing invalid repository from {rel_path}.')
         shutil.rmtree(rel_path)
         unregister_submodule(shared, pkgname)
         raise AlrinPackageMetadataError(f'Invalid git repository at {url!r}') from err
@@ -56,7 +58,8 @@ def pkg_add(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
     try:
         srcinfo = source_info_from_file(pkg_path.joinpath('.SRCINFO'))
     except SourceInfoError as err:
-        logger.error(f'Removing invalid repository from {rel_path}.')  # noqa: TRY400
+        logger.exception('Error reading .SRCINFO')
+        logger.info(f'Removing invalid repository from {rel_path}.')
         shutil.rmtree(rel_path)
         unregister_submodule(shared, pkgname)
         raise AlrinPackageMetadataError(f'Could not read .SRCINFO at {rel_path}') from err

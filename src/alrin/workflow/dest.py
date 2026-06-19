@@ -24,7 +24,8 @@ def remove_built_file(built: AlrinBuiltPackage) -> None:
 
 
 @bind_logger_to_subject(logger, lambda pkg: pkg.pkgname)
-def process_built_files(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:  # noqa: C901
+# ruff: ignore[complex-structure]
+def process_built_files(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
     built_files = get_newly_built(pkg)
     ignored_files = set[AlrinBuiltPackage]()
 
