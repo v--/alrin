@@ -69,7 +69,7 @@ def pkg_add(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
         mut['pkgver'] = '0'
         mut['pkgrel'] = '0'
 
-        if any(str(dep) == 'python' for dep in srcinfo.base.dependencies) and click.confirm('Mark as Python package?', True):
+        if any(str(dep) == 'python' for dep in srcinfo.base.dependencies) and click.confirm('Mark for adding a Python suffix?', True):
             mut['add_python_suffix'] = True
 
     logger.info('Building.')
