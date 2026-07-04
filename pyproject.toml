@@ -49,8 +49,12 @@ preview = true
 
 [tool.ruff.lint]
 ignore = [
-  "D1",      # undocumented-*
-  "TC001", "TC002", "TC003", # typing-only-*-import (we prefer lazy imports to `if TYPE_CHECKING` blocks)
+  # undocumented-*
+  "D1",
+  # We prefer lazy imports to `if TYPE_CHECKING` blocks.
+  "typing-only-first-party-import",
+  "typing-only-third-party-import",
+  "typing-only-standard-library-import",
 ]
 
 # mypy
