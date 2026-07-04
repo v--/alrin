@@ -32,7 +32,7 @@ requires-dist = [
     { name = "pygit2", specifier = ">=1.19" },
     { name = "python-alpm", specifier = ">=0.4" },
     { name = "python-gnupg", specifier = ">=0.5.6" },
-    { name = "viat", specifier = ">=0.10.4" },
+    { name = "viat", specifier = ">=0.10.6" },
 ]
 
 [package.metadata.requires-dev]
@@ -254,7 +254,7 @@ wheels = [
 
 [[package]]
 name = "viat"
-version = "0.10.4"
+version = "0.10.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -262,9 +262,9 @@ dependencies = [
     { name = "tomli-w" },
     { name = "wcmatch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/83/d5/8f9b1489d19c2f226f0ac21f0dbcbf07e085f242d2bdac6d9004b32413be/viat-0.10.4.tar.gz", hash = "sha256:ad661c065845a07405d572d766c6f68076857d76cd62ea3dcdf089f11b44c2d4", size = 24609, upload-time = "2026-06-08T14:09:14.725Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bf/10/9aaca55e50a588417c9fc41c6ffd031689481b52075f4a4c3d067b774b30/viat-0.10.6.tar.gz", hash = "sha256:0b873bbee46585c6a4f11c8af48f1d5187013505ca00e124522624d627ca3f6b", size = 78897, upload-time = "2026-07-04T22:57:28.469Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b4/3c/8f128814209e549e3f15a675a563eb6af8d49834609fe8024c8c451e6075/viat-0.10.4-py3-none-any.whl", hash = "sha256:d8f64ac737ad47a8ffca101573be840aa6f5dbd0841b977b76163dc69b7313d3", size = 46078, upload-time = "2026-06-08T14:09:13.708Z" },
+    { url = "https://files.pythonhosted.org/packages/7e/40/f8156421aa5c1e1f534b27594b6079ac26d9ca5201db96b5705fe491d74b/viat-0.10.6-py3-none-any.whl", hash = "sha256:78213d5c01bba7a52f7bddd922c7c62010bfbc57f55b482587bc55dbbb7236c3", size = 48291, upload-time = "2026-07-04T22:57:27.468Z" },
 ]
 
 [[package]]

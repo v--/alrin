@@ -19,7 +19,7 @@ dependencies = [
   "click (>=8)",
   "colorlog (>=6.8)",
   "pygit2 (>=1.19)",
-  "viat (>=0.10.4)",
+  "viat (>=0.10.6)",
   "python-gnupg (>=0.5.6)",
   "python-alpm (>=0.4)",
 ]
