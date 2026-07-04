@@ -58,10 +58,10 @@ def alpmdb_remove_packages(
     architectures = {built.info.pkgarch for built in existing_built}
 
     for arch in architectures:
-        package_names = [
-            built.info.pkgname for built in  existing_built
+        package_names = list({
+            built.info.pkgname for built in existing_built
             if built.info.pkgbase in pkgnames and built.info.pkgarch == arch
-        ]
+        })
 
         pkg_len = len(package_names)
         db_name = f'{arch}/{repo_name}.db.tar.zst'
