@@ -63,9 +63,9 @@ def makepkg_inside_jail(pkg: AlrinPackageSource, builddate: int | None = None) -
         subprocess.run(
             [
                 'makechrootpkg',
-                '-c', # Clean before building
+                '-c',  # Clean before building
                 '-r', jail_path.as_posix(),
-                '-l', 'build', # The directory to use as a working copy
+                '-l', 'build',  # The directory to use as a working copy
                 'base-devel',
                 *extra_args,
             ],

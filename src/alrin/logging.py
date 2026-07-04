@@ -28,7 +28,6 @@ def setup_logging(verbose: bool = False) -> None:
     base_logger.addHandler(AlrinLoggerHandler())
 
 
-
 class SubjectFilter(logging.Filter):
     subject: str
 
