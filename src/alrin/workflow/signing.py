@@ -1,4 +1,3 @@
-
 lazy import pathlib
 
 import gnupg
