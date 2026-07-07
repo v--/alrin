@@ -3,7 +3,7 @@ name = "alrin"
 version = "0.0.0"
 description = "Arch Linux repository for ivasilev.net"
 license = "Unlicense"
-license-files = ["LICENSE"]
+license-files = ["LICENSES/Unlicense.txt"]
 readme = "README.md"
 requires-python = ">=3.15"
 
@@ -38,6 +38,9 @@ dev = [
 # uv build complains if no upper bound is set, but it updates its minor versions often, so we put a major version just to shut it up
 requires = ["uv_build (>=0.10, <1)"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+source-include = ["REUSE.toml"]
 
 [tool.uv]
 resolution = "lowest-direct"
