@@ -1,9 +1,11 @@
 import logging
+import pathlib
 import subprocess
 lazy from collections.abc import Sequence
 
 from alrin.buildinfo import AlrinBuiltPackage, get_existing_built
 from alrin.exceptions import AlrinPackageMetadataError
+from alrin.wrappers import repo_add, repo_remove
 lazy from alrin.state import AlrinSharedState
 
 
@@ -25,7 +27,7 @@ def alpmdb_add_packages(
 
         arch = subdir.name
         package_paths = [
-            path.relative_to(dest).as_posix()
+            path.relative_to(dest)
             for path in subdir.iterdir() if path in new_package_paths
         ]
         pkg_len = len(package_paths)
@@ -33,16 +35,15 @@ def alpmdb_add_packages(
         if pkg_len == 0:
             continue
 
-        db_name = f'{arch}/{repo_name}.db.tar.zst'
-        logger.info(f'Adding {pkg_len} {'package' if pkg_len == 1 else 'packages'} to {db_name}.')
+        path_to_db = pathlib.Path(arch) / f'{repo_name}.db.tar.zst'
+        logger.info(f'Adding {pkg_len} {'package' if pkg_len == 1 else 'packages'} to {path_to_db}.')
 
         try:
-            subprocess.run(
-                [
-                    'repo-add', '--quiet', '--sign', db_name,
-                    *package_paths,
-                ],
-                check=True,
+            repo_add(
+                path_to_db=path_to_db,
+                package_paths=package_paths,
+                quiet=True,
+                sign=True,
                 cwd=dest,
             )
         except subprocess.CalledProcessError as err:
@@ -64,16 +65,15 @@ def alpmdb_remove_packages(
         })
 
         pkg_len = len(package_names)
-        db_name = f'{arch}/{repo_name}.db.tar.zst'
-        logger.info(f'Removing {pkg_len} {'package' if pkg_len == 1 else 'packages'} from {db_name}.')
+        path_to_db = pathlib.Path(arch) / f'{repo_name}.db.tar.zst'
+        logger.info(f'Removing {pkg_len} {'package' if pkg_len == 1 else 'packages'} from {path_to_db}.')
 
         try:
-            subprocess.run(
-                [
-                    'repo-remove', '--quiet', '--sign', db_name,
-                    *package_names,
-                ],
-                check=True,
+            repo_remove(
+                path_to_db=path_to_db,
+                package_names=pkgnames,
+                quiet=True,
+                sign=True,
                 cwd=shared.resolver.get_dest(),
             )
         except subprocess.CalledProcessError as err:

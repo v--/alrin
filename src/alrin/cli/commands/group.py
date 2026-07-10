@@ -7,10 +7,10 @@ import click
 from viat import ViatError, ViatVault
 from viat.vault import locate_existing_vault_root
 
-from alrin.binaries import check_binary_dependencies
 from alrin.exceptions import AlrinPackageError
 from alrin.resolver import AlrinPathResolver
 from alrin.state import AlrinSharedState
+from alrin.wrappers import check_binary_dependencies
 
 
 @contextlib.contextmanager
@@ -28,11 +28,7 @@ def with_cli_exception_handler() -> Generator[None]:
 @click.pass_context
 @click.option('-v', '--verbose', is_flag=True)
 def alrin(ctx: click.Context, verbose: bool) -> None:
-    check_binary_dependencies(
-        'which', 'git',
-        'repo-add', 'repo-remove',
-        'arch-nspawn', 'mkarchroot', 'makechrootpkg',
-    )
+    check_binary_dependencies()
 
     with with_cli_exception_handler():
         vault = ViatVault(

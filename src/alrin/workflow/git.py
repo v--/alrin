@@ -1,5 +1,6 @@
 import contextlib
 import logging
+import pathlib
 import shutil
 import subprocess
 
@@ -7,6 +8,7 @@ import pygit2
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import bind_logger_to_subject
+from alrin.wrappers import git_config, git_rm
 lazy from alrin.source import AlrinPackageSource
 lazy from alrin.state import AlrinSharedState
 
@@ -61,36 +63,31 @@ def unregister_submodule(shared: AlrinSharedState, pkgname: str) -> None:
     # libgit2 cannot handle submodule deletion
     logger.info('Unstaging git submodule.')
     with contextlib.suppress(subprocess.CalledProcessError):
-        subprocess.run(
-            [
-                'git', 'rm', '--cached', '--force', raw_path,
-            ],
-            check=True,
+        git_rm(
+            rel_path,
+            cached=True,
+            force=True,
             cwd=root_path,
         )
 
     logger.info('Unregistering git submodule.')
     with contextlib.suppress(subprocess.CalledProcessError):
         # git submodule deinit doesn't work here fore some reason
-        subprocess.run(
-            [
-                'git', 'config', '--file', '.git/config', '--remove-section', f'submodule.{raw_path}',
-            ],
-            check=True,
+        git_config(
+            file=pathlib.Path('.git') / 'config',
+            remove_section=f'submodule.{raw_path}',
             cwd=root_path,
         )
 
     logger.info('Removing git submodule config.')
     with contextlib.suppress(subprocess.CalledProcessError):
-        subprocess.run(
-            [
-                'git', 'config', '--file', '.gitmodules', '--remove-section', f'submodule.{raw_path}',
-            ],
-            check=True,
+        git_config(
+            file=pathlib.Path('.gitmodules'),
+            remove_section=f'submodule.{raw_path}',
             cwd=root_path,
         )
 
-    internal_module_path = shared.resolver.get_root() / '.git' / 'modules' / raw_path
+    internal_module_path = shared.resolver.get_root() / '.git' / 'modules' / rel_path
 
     if internal_module_path.exists():
         logger.info('Removing internal git submodule clone.')
