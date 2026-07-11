@@ -1,5 +1,5 @@
-# ruff: file-ignore[repeated-append]
 
+# ruff: file-ignore[repeated-append]
 import logging
 import pathlib
 import subprocess
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 BINARY_DEPENDENCIES = [
-    'which', 'git',
+    'which',
     'repo-add', 'repo-remove',
     'arch-nspawn', 'mkarchroot', 'makechrootpkg',
 ]
@@ -151,55 +151,6 @@ def repo_remove(
         [
             'repo-remove', *option_args, path_to_db,
             *package_names,
-        ],
-        check=True,
-        cwd=cwd,
-    )
-
-
-def git_rm(
-    path: pathlib.Path,
-    *,
-    cached: bool = False,
-    force: bool = False,
-    cwd: pathlib.Path | None = None,
-) -> None:
-    extra_args = list[str]()
-
-    if cached:
-        extra_args.append('--cached')
-
-    if force:
-        extra_args.append('--force')
-
-    subprocess.run(
-        [
-            'git', 'rm', path.as_posix(), *extra_args,
-        ],
-        check=True,
-        cwd=cwd,
-    )
-
-
-def git_config(
-    *,
-    file: pathlib.Path | None = None,
-    remove_section: str | None = None,
-    cwd: pathlib.Path | None = None,
-) -> None:
-    extra_args = list[str]()
-
-    if file:
-        extra_args.append('--file')
-        extra_args.append(file.as_posix())
-
-    if remove_section:
-        extra_args.append('--remove_section')
-        extra_args.append(remove_section)
-
-    subprocess.run(
-        [
-            'git', 'config', *extra_args,
         ],
         check=True,
         cwd=cwd,

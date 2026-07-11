@@ -27,8 +27,6 @@ def remove(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
     resolver = AlrinPathResolver(shared.vault)
     pkg_path = resolver.get_pkg(pkgname)
 
-    logger.info('Unregistering git submodule.')
-
     unregister_submodule(shared, pkgname)
 
     if pkg_path.exists():
