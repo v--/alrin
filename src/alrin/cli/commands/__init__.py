@@ -1,9 +1,6 @@
 from . import (
-    bulk_update,
-    pkg_add,
-    pkg_rebuild,
-    pkg_remove,
-    pkg_update,
+    bulk,
+    pkg,
 )
 from .group import alrin
 

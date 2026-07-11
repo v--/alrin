@@ -6,21 +6,22 @@ import click
 from alrin.buildinfo import get_existing_built
 from alrin.logging import bind_logger_to_subject, setup_logging
 from alrin.resolver import AlrinPathResolver
+from alrin.state import AlrinSharedState
 from alrin.workflow import alpmdb_remove_packages, remove_built_file, unregister_submodule
 
-from .group import AlrinSharedState, alrin
+from .group import pkg as pkg_cli
 
 
 logger = logging.getLogger(__name__)
 
 
-@alrin.command()
+@pkg_cli.command()
 @click.argument('pkgname')
 @click.option('-v', '--verbose', is_flag=True)
 @click.pass_obj
 # ruff: ignore[unused-lambda-argument]
 @bind_logger_to_subject(logger, lambda shared, pkgname, verbose: pkgname)
-def pkg_remove(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
+def remove(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
     setup_logging(shared.verbose_logging or verbose)
 
     resolver = AlrinPathResolver(shared.vault)

@@ -9,6 +9,7 @@ from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import bind_logger_to_subject, setup_logging
 from alrin.resolver import AlrinPathResolver
 from alrin.source import AlrinPackageSource
+from alrin.state import AlrinSharedState
 from alrin.workflow import (
     alpmdb_add_packages,
     clean_worktree,
@@ -19,20 +20,20 @@ from alrin.workflow import (
     unregister_submodule,
 )
 
-from .group import AlrinSharedState, alrin
+from .group import pkg as pkg_cli
 
 
 URL_PATTERN = 'https://aur.archlinux.org/{pkgname}.git'
 logger = logging.getLogger(__name__)
 
 
-@alrin.command()
+@pkg_cli.command()
 @click.argument('pkgname')
 @click.option('-v', '--verbose', is_flag=True)
 @click.pass_obj
 # ruff: ignore[unused-lambda-argument]
 @bind_logger_to_subject(logger, lambda shared, pkgname, verbose: pkgname)
-def pkg_add(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
+def add(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
     setup_logging(shared.verbose_logging or verbose)
 
     url = URL_PATTERN.format(pkgname=pkgname)

@@ -4,6 +4,7 @@ import click
 
 from alrin.logging import bind_logger_to_subject, setup_logging
 from alrin.source import AlrinPackageSource
+from alrin.state import AlrinSharedState
 from alrin.workflow import (
     alpmdb_add_packages,
     clean_worktree,
@@ -14,19 +15,19 @@ from alrin.workflow import (
     update_repo,
 )
 
-from .group import AlrinSharedState, alrin
+from .group import pkg as pkg_cli
 
 
 logger = logging.getLogger(__name__)
 
 
-@alrin.command()
+@pkg_cli.command()
 @click.argument('pkgname')
 @click.option('-v', '--verbose', is_flag=True)
 @click.pass_obj
 # ruff: ignore[unused-lambda-argument]
 @bind_logger_to_subject(logger, lambda shared, pkgname, verbose: pkgname)
-def pkg_update(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
+def update(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
     setup_logging(shared.verbose_logging or verbose)
 
     pkg = AlrinPackageSource(shared, pkgname)

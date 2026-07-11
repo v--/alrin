@@ -3,6 +3,7 @@ import click
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import setup_logging
 from alrin.source import AlrinPackageSource
+from alrin.state import AlrinSharedState
 from alrin.workflow import (
     alpmdb_add_packages,
     clean_worktree,
@@ -12,14 +13,14 @@ from alrin.workflow import (
     process_built_files,
 )
 
-from .group import AlrinSharedState, alrin
+from .group import pkg as pkg_cli
 
 
-@alrin.command()
+@pkg_cli.command()
 @click.argument('pkgname')
 @click.option('-v', '--verbose', is_flag=True)
 @click.pass_obj
-def pkg_rebuild(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
+def rebuild(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
     setup_logging(shared.verbose_logging or verbose)
 
     pkg = AlrinPackageSource(shared, pkgname)

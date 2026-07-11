@@ -31,19 +31,19 @@ You can optionally copy or symlink a `pacman.conf` file in `$ALRIN_STATE_REPO` a
 The following can then register `<package>` from the AUR:
 
 ```shell
-alrin pkg-add <package>
+alrin pkg add <package>
 ```
 
 The following updates all packages:
 
 ```shell
-alrin bulk-update
+alrin bulk update
 ```
 
 The [tricky job](https://stackoverflow.com/a/35743109/2756776) of removing a git submodule, along with the associated build files and Viat metadata, can be done by
 
 ```shell
-alrin pkg-remove <package>
+alrin pkg remove <package>
 ```
 
 There are two more commands --- see below.
@@ -59,7 +59,7 @@ pkgrel = "3.314"
 builddate = 1781369820
 ```
 
-If modified during the build, `pkgver`, `pkgrel` and `buliddate` attributes are set after each `pkg-update <package>` or `bulk-update`. The `builddate` is reused as `SOURCE_DATE_EPOCH` if running `pkg-rebuild <package>` (if a [reproducible](https://reproducible-builds.org) package needs to be recreated for whatever reason).
+If modified during the build, `pkgver`, `pkgrel` and `buliddate` attributes are set after each `pkg update <package>` or `bulk-update`. The `builddate` is reused as `SOURCE_DATE_EPOCH` if running `pkg rebuild <package>` (if a [reproducible](https://reproducible-builds.org) package needs to be recreated for whatever reason).
 
 Here is a slightly more complicated example:
 

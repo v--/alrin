@@ -6,6 +6,7 @@ from alrin.buildinfo import AlrinBuiltPackage
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import inject_subject, setup_logging
 from alrin.source import AlrinPackageSource
+from alrin.state import AlrinSharedState
 from alrin.workflow import (
     alpmdb_add_packages,
     clean_worktree,
@@ -16,16 +17,16 @@ from alrin.workflow import (
     update_repo,
 )
 
-from .group import AlrinSharedState, alrin
+from .group import bulk as bulk_cli
 
 
 logger = logging.getLogger(__name__)
 
 
-@alrin.command()
+@bulk_cli.command()
 @click.option('-v', '--verbose', is_flag=True)
 @click.pass_obj
-def bulk_update(shared: AlrinSharedState, verbose: bool) -> None:
+def update(shared: AlrinSharedState, verbose: bool) -> None:
     setup_logging(shared.verbose_logging or verbose)
     updated = list[AlrinPackageSource]()
 
