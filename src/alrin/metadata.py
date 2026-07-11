@@ -47,7 +47,6 @@ class AlrinMetadata:
             add_python_suffix=cast('bool', reader.get('add_python_suffix', False)),
             git_root=cast('str | None', reader.get('git_root')),
             extra_makedepends=cast('Sequence[str] | None', reader.get('extra_makedepends')),
-            skip_pgp=cast('bool', reader.get('skip_pgp', False)),
             note=cast('str | None', reader.get('note')),
         )
 
@@ -55,6 +54,5 @@ class AlrinMetadata:
     builddate: int | None
     git_root: str | None
     add_python_suffix: bool
-    skip_pgp: bool
     extra_makedepends: Sequence[str] | None
     note: str | None

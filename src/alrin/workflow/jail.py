@@ -40,17 +40,11 @@ def makepkg_inside_jail(pkg: AlrinPackageSource, builddate: int | None = None) -
     with inject_subject(logger, pkg.pkgname):
         logger.info('Building inside jail.')
 
-    makepkg_args = list[str]()
-
-    if pkg.viat_meta.skip_pgp:
-        makepkg_args = ['--', '--skippgpcheck']
-
     try:
         makechrootpkg(
             chrootdir=jail_path,
             clean_before_building=True,
             working_dir_name='build',
-            makepkg_args=makepkg_args,
             cwd=pkg.get_abs_path(),
             SOURCE_DATE_EPOCH=builddate,
             GNUPGHOME=pkg.shared.resolver.get_keyring(),

@@ -95,5 +95,3 @@ Alrin creates a custom keyring at `$ALRIN_STATE_REPO/keyring` that is used durin
 ```shell
 GNUPGHOME=$ALRIN_STATE_REPO/keyring gpg ...
 ```
-
-There are some more supported attributes like `skip_pgp` (in case the PGP signatures have been verified independently) or `note` (for plain text notes).
