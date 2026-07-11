@@ -59,7 +59,7 @@ pkgrel = "3.314"
 builddate = 1781369820
 ```
 
-If modified during the build, `pkgver`, `pkgrel` and `buliddate` attributes are set after each `pkg update <package>` or `bulk-update`. The `builddate` is reused as `SOURCE_DATE_EPOCH` if running `pkg rebuild <package>` (if a [reproducible](https://reproducible-builds.org) package needs to be recreated for whatever reason).
+If modified during the build, `pkgver`, `pkgrel` and `buliddate` attributes are set after each `pkg update <package>` or `bulk-update`. The `builddate` is reused as `SOURCE_DATE_EPOCH` if running `pkg rebuild <package>` (if a [reproducible](https://reproducible-builds.org) package needs to be recreated for whatever reason; note that `.BUILDINFO` will differ the package's dependencies are updated).
 
 Here is a slightly more complicated example:
 
