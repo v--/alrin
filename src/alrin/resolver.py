@@ -20,5 +20,8 @@ class AlrinPathResolver:
     def get_dest(self) -> pathlib.Path:
         return self.get_root() / 'pkgdest'
 
+    def get_keyring(self) -> pathlib.Path:
+        return self.get_root() / 'keyring'
+
     def relativize(self, path: pathlib.Path) -> pathlib.Path:
         return self.vault.resolver.relativize(path)

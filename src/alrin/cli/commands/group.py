@@ -10,6 +10,7 @@ from viat.vault import locate_existing_vault_root
 from alrin.exceptions import AlrinPackageError
 from alrin.resolver import AlrinPathResolver
 from alrin.state import AlrinSharedState
+from alrin.workflow import initialize_keyring
 from alrin.wrappers import check_binary_dependencies
 
 
@@ -37,10 +38,8 @@ def alrin(ctx: click.Context, verbose: bool) -> None:
             ),
         )
 
-    ctx.obj = AlrinSharedState(
-        vault,
-        AlrinPathResolver(vault),
-        verbose_logging=verbose,
-    )
+    resolver = AlrinPathResolver(vault)
+    initialize_keyring(resolver.get_keyring())
+    ctx.obj = AlrinSharedState(vault, resolver, verbose_logging=verbose)
 
     ctx.with_resource(with_cli_exception_handler())

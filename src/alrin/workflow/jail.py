@@ -53,6 +53,7 @@ def makepkg_inside_jail(pkg: AlrinPackageSource, builddate: int | None = None) -
             makepkg_args=makepkg_args,
             cwd=pkg.get_abs_path(),
             SOURCE_DATE_EPOCH=builddate,
+            GNUPGHOME=pkg.shared.resolver.get_keyring(),
         )
     except subprocess.CalledProcessError as err:
         raise AlrinPackageMetadataError('Build failed') from err

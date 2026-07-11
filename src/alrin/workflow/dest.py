@@ -10,7 +10,7 @@ from alrin.logging import bind_logger_to_subject
 from alrin.metadata import AlrinMetadata
 lazy from alrin.source import AlrinPackageSource
 
-from .signing import create_signature_file
+from .gnupg import create_signature_file
 
 
 logger = logging.getLogger(__name__)

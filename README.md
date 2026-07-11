@@ -88,4 +88,12 @@ builddate = 1781374235
 
 Here, `pkgbuild/mkinitcpio-growrootfs` is a symlink to `../ec2-packages/mkinitcpio-growrootfs`, where `ec2-packages` is [this repository](https://git.uplinklabs.net/steven/ec2-packages). The role of the `git_root` attribute should be obvious.
 
+## GPG Keyring
+
+Alrin creates a custom keyring at `$ALRIN_STATE_REPO/keyring` that is used during the build. It can be managed via
+
+```shell
+GNUPGHOME=$ALRIN_STATE_REPO/keyring gpg ...
+```
+
 There are some more supported attributes like `skip_pgp` (in case the PGP signatures have been verified independently) or `note` (for plain text notes).

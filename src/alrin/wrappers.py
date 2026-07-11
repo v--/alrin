@@ -71,7 +71,10 @@ def makechrootpkg(
     clean_before_building: bool = False,
     working_dir_name: str | None = None,
     cwd: pathlib.Path | None = None,
-    SOURCE_DATE_EPOCH: int | None = None,  # noqa: N803
+    # ruff: ignore[invalid-argument-name]
+    SOURCE_DATE_EPOCH: int | None = None,
+    # ruff: ignore[invalid-argument-name]
+    GNUPGHOME: pathlib.Path | None = None,
 ) -> None:
     args = ['makechrootpkg', '-r', chrootdir.as_posix()]
 
@@ -86,11 +89,19 @@ def makechrootpkg(
         args.append('--')
         args.extend(makepkg_args)
 
+    env = dict[str, str]()
+
+    if SOURCE_DATE_EPOCH is not None:
+        env['SOURCE_DATE_EPOCH'] = str(SOURCE_DATE_EPOCH)
+
+    if GNUPGHOME is not None:
+        env['GNUPGHOME'] = GNUPGHOME.as_posix()
+
     subprocess.run(
         args,
         check=True,
         cwd=cwd,
-        env={'SOURCE_DATE_EPOCH': str(SOURCE_DATE_EPOCH)} if SOURCE_DATE_EPOCH is not None else {},
+        env=env,
     )
 
 
