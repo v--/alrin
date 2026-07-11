@@ -95,3 +95,15 @@ Alrin creates a custom keyring at `$ALRIN_STATE_REPO/keyring` that is used durin
 ```shell
 GNUPGHOME=$ALRIN_STATE_REPO/keyring gpg ...
 ```
+
+This directory is intended to be ignored by version control. The `$ALRIN_STATE_REPO/keyring_backup.asc` file can be used to backup and restore its public keys via
+
+```shell
+alrin keyring backup
+```
+
+and
+
+```shell
+alrin keyring restore
+```

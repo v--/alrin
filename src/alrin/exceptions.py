@@ -16,3 +16,7 @@ class AlrinPackageMetadataError(AlrinPackageError):
 
 class AlrinPackageBuildError(AlrinPackageError):
     pass
+
+
+class AlrinKeyringError(AlrinError):
+    pass

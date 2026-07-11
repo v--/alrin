@@ -23,5 +23,8 @@ class AlrinPathResolver:
     def get_keyring(self) -> pathlib.Path:
         return self.get_root() / 'keyring'
 
+    def get_keyring_backup(self) -> pathlib.Path:
+        return self.get_root() / 'keyring_backup.asc'
+
     def relativize(self, path: pathlib.Path) -> pathlib.Path:
         return self.vault.resolver.relativize(path)

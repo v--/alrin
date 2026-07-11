@@ -1,5 +1,6 @@
 from . import (
     bulk,
+    keyring,
     pkg,
 )
 from .group import alrin
