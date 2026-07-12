@@ -71,7 +71,7 @@ def alpmdb_remove_packages(
         try:
             repo_remove(
                 path_to_db=path_to_db,
-                package_names=pkgnames,
+                package_names=package_names,
                 quiet=True,
                 sign=True,
                 cwd=shared.resolver.get_dest(),
