@@ -19,7 +19,7 @@ def makepkg_inside_jail(pkg: AlrinPackageSource, builddate: int | None = None) -
         try:
             arch_nspawn(
                 working_dir=jail_path / 'root',
-                command=['pacman', '--sync', '--refresh', '--sysupgrade'],
+                command=['pacman', '--sync', '--refresh', '--sysupgrade', '--noconfirm'],
                 pacman_config=pkg.shared.resolver.get_root().joinpath('pacman.conf'),
                 cwd=pkg.shared.resolver.get_dest(),
             )
