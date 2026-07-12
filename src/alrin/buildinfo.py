@@ -64,6 +64,7 @@ def get_newly_built(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
     return [
         AlrinBuiltPackage(pkg_path)
         for pkg_path in pkg.get_abs_path().glob('*.pkg.*')
+        if pkg_path.suffix not in {'.sig', '.db'}
     ]
 
 
