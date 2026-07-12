@@ -46,7 +46,6 @@ class AlrinMetadata:
             builddate=cast('int | None', reader.get('builddate')),
             add_python_suffix=cast('bool', reader.get('add_python_suffix', False)),
             git_root=cast('str | None', reader.get('git_root')),
-            extra_makedepends=cast('Sequence[str] | None', reader.get('extra_makedepends')),
             note=cast('str | None', reader.get('note')),
         )
 
@@ -54,5 +53,4 @@ class AlrinMetadata:
     builddate: int | None
     git_root: str | None
     add_python_suffix: bool
-    extra_makedepends: Sequence[str] | None
     note: str | None

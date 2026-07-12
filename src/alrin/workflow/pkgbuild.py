@@ -59,22 +59,6 @@ def extract_pkgbuild_version(file: TextIO) -> AlrinPackageVersion:
 def preprocess_pkgbuild(pkg: AlrinPackageSource) -> None:
     pkgbuild_path = pkg.get_abs_path().joinpath('PKGBUILD')
 
-    if pkg.viat_meta.extra_makedepends is not None:
-        with inject_subject(logger, pkg.pkgname):
-            logger.info('Adding custom extra_makedepends list.')
-
-        pkgbuild = pkgbuild_path.read_text('utf-8')
-        extra_makedepends = ' '.join(repr(dep) for dep in pkg.viat_meta.extra_makedepends)
-
-        if 'makedepends=' in pkgbuild:
-            pkgbuild_path.write_text(
-                pkgbuild.replace('makedepends=(', 'makedepends=(' + extra_makedepends + ' '),
-            )
-        else:
-            pkgbuild_path.write_text(
-                'makedepends=(' + extra_makedepends + ')\n' + pkgbuild,
-            )
-
     with pkg.get_abs_path().joinpath('PKGBUILD').open() as file:
         pkgbuild_version = extract_pkgbuild_version(file)
 

@@ -61,20 +61,15 @@ builddate = 1781369820
 
 If modified during the build, `pkgver`, `pkgrel` and `buliddate` attributes are set after each `pkg update <package>` or `bulk-update`. The `builddate` is reused as `SOURCE_DATE_EPOCH` if running `pkg rebuild <package>` (if a [reproducible](https://reproducible-builds.org) package needs to be recreated for whatever reason; note that `.BUILDINFO` will differ the package's dependencies are updated).
 
-Here is a slightly more complicated example:
+For Python packages, whose installation directory depends on the version of Python, a custom suffix can be automatically added to `pkgrel`, like so (see [this thread](https://bbs.archlinux.org/viewtopic.php?id=311573) for details):
 
 ```toml
-["pkgbuild/python-postfix-policyd-spf"]
-extra_makedepends = [
-    "python-setuptools",
-]
-pkgver = "2.0.2"
-pkgrel = "5.314"
-builddate = 1781386810
+["pkgbuild/python-djvulibre-python"]
+pkgver = "0.9.3"
+pkgrel = "3.314"
 add_python_suffix = true
+builddate = 1783420854
 ```
-
-The role of `extra_makedepends` should be obvious. The `add_python_suffix` flag determines whether to automatically add a Python version suffix to `pkgrel` in case the package has none. See [this thread](https://bbs.archlinux.org/viewtopic.php?id=311573) for details.
 
 Finally, consider the following example:
 

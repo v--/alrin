@@ -6,7 +6,6 @@
     "epoch": {"type": "number"},
     "builddate": {"type": "number"},
     "git_root": {"type": "string"},
-    "extra_makedepends": {"type": "array", "elements": {"type": "string"}},
     "add_python_suffix": {"type": "boolean"},
     "note": {"type":"string"}
   },
