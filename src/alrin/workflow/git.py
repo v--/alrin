@@ -50,14 +50,6 @@ def update_repo(pkg: AlrinPackageSource) -> None:
     clean_worktree(pkg)
 
 
-def git_add_to_index(repo: pygit2.Repository, path: pathlib.Path | str) -> None:
-    """Add a possibly deleted file to the index."""
-    head = repo[repo.head.target]
-    obj = head.tree[path]
-    entry = pygit2.IndexEntry(path, obj.id, obj.filemode)
-    repo.index.add(entry)
-
-
 @bind_logger_to_subject(logger, lambda _, pkgname: pkgname)
 def unregister_submodule(shared: AlrinSharedState, pkgname: str) -> None:
     # Removing a git module is tricky. We remove the directory itself only after unregistering it.
