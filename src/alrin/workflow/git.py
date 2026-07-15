@@ -1,6 +1,5 @@
-import pathlib
-import contextlib
 import logging
+import pathlib
 import shutil
 
 import pygit2
@@ -24,6 +23,21 @@ def clean_worktree(pkg: AlrinPackageSource) -> None:
     pkg.repo.checkout_head(
         strategy=pygit2.GIT_CHECKOUT_FORCE | pygit2.GIT_CHECKOUT_REMOVE_UNTRACKED | pygit2.GIT_CHECKOUT_REMOVE_UNTRACKED,
     )
+
+
+# libgit2 is bad at removing entire sections, so we recreate the config anew
+def remove_config_section(path: pathlib.Path, section_name: str) -> None:
+    config = pygit2.Config(path.as_posix())
+
+    if any(section.name.startswith(section_name) for section in config):
+        logger.info(f'Removing section {section_name} from {path}.')
+        entries = list(config)
+        path.unlink()
+        new_config = pygit2.Config(path.as_posix())
+
+        for entry in entries:
+            if not entry.name.startswith(section_name):
+                new_config[entry.name] = entry.value
 
 
 @bind_logger_to_subject(logger, lambda pkg: pkg.pkgname)
@@ -66,21 +80,15 @@ def unregister_submodule(shared: AlrinSharedState, pkgname: str) -> None:
         repo.index.add_all([raw_path])
         repo.index.write()
 
-    main_config = pygit2.Config(root_path.joinpath('.git', 'config').as_posix())
+    remove_config_section(
+        root_path.joinpath('.git', 'config'),
+        f'submodule.{raw_path}',
+    )
 
-    if f'submodule.{raw_path}.path' in main_config:
-        logger.info('Unregistering git submodule.')
-        del main_config[f'submodule.{raw_path}.url']
-        del main_config[f'submodule.{raw_path}.path']
-
-    submodule_config = pygit2.Config(root_path.joinpath('.gitmodules').as_posix())
-
-    if f'submodule.{raw_path}.path' in submodule_config:
-        logger.info('Removing git submodule config.')
-        del submodule_config[f'submodule.{raw_path}.url']
-        del submodule_config[f'submodule.{raw_path}.path']
-        repo.index.add('.gitmodules')
-        repo.index.write()
+    remove_config_section(
+        root_path.joinpath('.gitmodules'),
+        f'submodule.{raw_path}',
+    )
 
     internal_module_path = shared.resolver.get_root() / '.git' / 'modules' / raw_path
 
