@@ -122,7 +122,7 @@ def repo_add(
 
     subprocess.run(
         [
-            'repo-add', *option_args, path_to_db,
+            'repo-add', *option_args, path_to_db.as_posix(),
             *(path.as_posix() for path in package_paths),
         ],
         check=True,
@@ -148,7 +148,7 @@ def repo_remove(
 
     subprocess.run(
         [
-            'repo-remove', *option_args, path_to_db,
+            'repo-remove', *option_args, path_to_db.as_posix(),
             *package_names,
         ],
         check=True,

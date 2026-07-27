@@ -71,6 +71,5 @@ def get_newly_built(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
 def get_existing_built(shared: AlrinSharedState) -> Sequence[AlrinBuiltPackage]:
     return [
         AlrinBuiltPackage(pkg_path)
-        for pkg_path in shared.resolver.get_dest().rglob('*.pkg.*')
-        if pkg_path.suffix not in {'.sig', '.db'}
+        for pkg_path in shared.resolver.get_dest().rglob('*.pkg.tar.zst')
     ]

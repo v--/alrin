@@ -46,5 +46,5 @@ def remove(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
         alpmdb_remove_packages(shared, pkgname)
 
     for existing in existing_built:
-        logger.info(f'Removing {existing.info.pkgarch}/{existing.path.name}.')
+        logger.info(f'Removing {existing.path.parent.name}/{existing.path.name}.')
         remove_built_file(existing)

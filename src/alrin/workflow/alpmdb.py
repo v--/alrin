@@ -1,6 +1,7 @@
 import logging
 import pathlib
 import subprocess
+from typing import no_type_check
 lazy from collections.abc import Sequence
 
 from alrin.buildinfo import AlrinBuiltPackage, get_existing_built
@@ -50,23 +51,25 @@ def alpmdb_add_packages(
             raise AlrinPackageMetadataError('Repository update failed') from err
 
 
+@no_type_check  # mypy does not yet support comprehension unpacking; see https://github.com/python/mypy/issues/21447
 def alpmdb_remove_packages(
     shared: AlrinSharedState,
     *pkgnames: str,
     repo_name: str = DEFAULT_REPOSITORY_NAME,
 ) -> None:
     existing_built = get_existing_built(shared)
-    architectures = {built.info.pkgarch for built in existing_built}
+
+    package_names = list({
+        built.info.pkgname for built in existing_built if built.info.pkgbase in pkgnames
+    })
+
+    architectures = list({
+        *built.iter_arch() for built in existing_built if built.info.pkgbase in pkgnames
+    })
 
     for arch in architectures:
-        package_names = list({
-            built.info.pkgname for built in existing_built
-            if built.info.pkgbase in pkgnames and built.info.pkgarch == arch
-        })
-
-        pkg_len = len(package_names)
         path_to_db = pathlib.Path(arch) / f'{repo_name}.db.tar.zst'
-        logger.info(f'Removing {pkg_len} {'package' if pkg_len == 1 else 'packages'} from {path_to_db}.')
+        logger.info(f'Removing {len(package_names)} {'package' if len(package_names) == 1 else 'packages'} from {path_to_db}.')
 
         try:
             repo_remove(
