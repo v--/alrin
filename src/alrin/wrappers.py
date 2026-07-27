@@ -1,4 +1,3 @@
-
 # ruff: file-ignore[repeated-append]
 import logging
 import pathlib
