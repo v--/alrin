@@ -52,7 +52,7 @@ def add(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
     except pygit2.GitError as err:
         logger.exception('Git error')
         logger.info(f'Removing invalid repository from {rel_path}.')
-        shutil.rmtree(rel_path)
+        shutil.rmtree(rel_path, ignore_errors=True)
         unregister_submodule(shared, pkgname)
         raise AlrinPackageMetadataError(f'Invalid git repository at {url!r}') from err
 
@@ -61,7 +61,7 @@ def add(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
     except SourceInfoError as err:
         logger.exception('Error reading .SRCINFO')
         logger.info(f'Removing invalid repository from {rel_path}.')
-        shutil.rmtree(rel_path)
+        shutil.rmtree(rel_path, ignore_errors=True)
         unregister_submodule(shared, pkgname)
         raise AlrinPackageMetadataError(f'Could not read .SRCINFO at {rel_path}') from err
 
