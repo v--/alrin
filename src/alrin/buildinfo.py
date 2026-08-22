@@ -41,10 +41,13 @@ def extract_buildinfo(pkg_path: pathlib.Path) -> AlrinBuildInfo:
     hints = get_type_hints(AlrinBuildInfo)
 
     with tarfile.open(pkg_path) as file:
-        buildinfo = file.extractfile('.BUILDINFO')
+        try:
+            buildinfo = file.extractfile('.BUILDINFO')
+        except KeyError as err:
+            raise AlrinPackageMetadataError(f'No .BUILDINFO file in {pkg_path}') from err
 
         if buildinfo is None:
-            raise AlrinPackageMetadataError(f'No .BUILDINFO file in {pkg_path}')
+            raise AlrinPackageMetadataError(f'.BUILDINFO of {pkg_path} is not a file')
 
         while line := buildinfo.readline():
             key, value = map(str.strip, line.decode(encoding='utf-8').split('=', maxsplit=2))

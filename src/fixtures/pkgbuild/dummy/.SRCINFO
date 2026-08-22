@@ -1,8 +1,0 @@
-pkgbase = dummy
-	pkgdesc = Dummy ALPM repository
-	pkgver = 1
-	pkgrel = 1
-	arch = any
-	license = MIT
-
-pkgname = dummy

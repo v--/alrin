@@ -20,8 +20,13 @@ def geneate_pkgbuild_regex(key: str) -> re.Pattern:
 
 def find_pkgbuild_value(pkgbuild_text: str, key: str) -> str | None:
     if match := re.search(geneate_pkgbuild_regex(key), pkgbuild_text):
-        raw_value = match.group('value')
+        return match.group('value')
 
+    return None
+
+
+def find_pkgbuild_string(pkgbuild_text: str, key: str) -> str | None:
+    if raw_value := find_pkgbuild_value(pkgbuild_text, key):
         try:
             value = ast.literal_eval(raw_value)
 
@@ -29,7 +34,7 @@ def find_pkgbuild_value(pkgbuild_text: str, key: str) -> str | None:
                 return value
             else:
                 return raw_value
-        except SyntaxError:
+        except ValueError:
             return raw_value
 
     return None
@@ -37,17 +42,17 @@ def find_pkgbuild_value(pkgbuild_text: str, key: str) -> str | None:
 
 def extract_pkgbuild_version(file: TextIO) -> AlrinPackageVersion:
     pkgbuild_text = file.read()
-    pkgver = find_pkgbuild_value(pkgbuild_text, 'pkgver')
+    pkgver = find_pkgbuild_string(pkgbuild_text, 'pkgver')
 
     if pkgver is None:
         raise AlrinPackageMetadataError('Could not read pkgver from PKGBUILD')
 
-    pkgrel = find_pkgbuild_value(pkgbuild_text, 'pkgrel')
+    pkgrel = find_pkgbuild_string(pkgbuild_text, 'pkgrel')
 
     if pkgrel is None:
         raise AlrinPackageMetadataError('Could not read pkgver from PKGBUILD')
 
-    epoch = find_pkgbuild_value(pkgbuild_text, 'epoch')
+    epoch = find_pkgbuild_string(pkgbuild_text, 'epoch')
 
     return AlrinPackageVersion(
         pkgver=pkgver,
