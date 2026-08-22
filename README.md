@@ -17,14 +17,7 @@ To use `alrin` without cloning the repository, you can utilize [`pipx`](https://
 pipx install git+https://github.com/v--/alrin
 ```
 
-A new state repository can be initialized by running a variation of
-
-```shell
-mkdir $ALRIN_STATE_REPO
-cp --recursive viat_sample $ALRIN_STATE_REPO/.viat
-cd $ALRIN_STATE_REPO
-git init
-```
+A new state repository can be initialized by running `alrin init` in an empty directory.
 
 You can optionally copy or symlink a `pacman.conf` file in `$ALRIN_STATE_REPO` and it will get synchronized before very build.
 

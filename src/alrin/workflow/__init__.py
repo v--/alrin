@@ -4,3 +4,4 @@ from .git import clean_worktree, unregister_submodule, update_repo
 from .gnupg import create_signature_file, initialize_keyring
 from .jail import makepkg_inside_jail
 from .pkgbuild import postprocess_pkgbuild, preprocess_pkgbuild
+from .state import initialize_state_repo

@@ -6,6 +6,10 @@ class AlrinError(AlrinException):
     pass
 
 
+class AlrinRepositoryError(AlrinError):
+    pass
+
+
 class AlrinPackageError(AlrinError):
     pass
 
