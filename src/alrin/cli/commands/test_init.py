@@ -2,11 +2,11 @@ import pathlib
 
 from click.testing import CliRunner
 
-from alrin.cli import alrin
+from alrin.cli import alrin_cli
 
 
 def test_init_success(temp_directory: pathlib.Path, click_runner: CliRunner) -> None:
-    result = click_runner.invoke(alrin, ['init'], env={'ALRIN_STATE_REPO': temp_directory.as_posix()})
+    result = click_runner.invoke(alrin_cli, ['init'], env={'ALRIN_STATE_REPO': temp_directory.as_posix()})
 
     assert result.stdout == ''
     assert result.stderr == ''
@@ -20,7 +20,7 @@ def test_init_success(temp_directory: pathlib.Path, click_runner: CliRunner) -> 
 
 
 def test_init_nonexistent_dir(temp_directory: pathlib.Path, click_runner: CliRunner) -> None:
-    result = click_runner.invoke(alrin, ['init'], env={'ALRIN_STATE_REPO': temp_directory.joinpath('nonexistent').as_posix()})
+    result = click_runner.invoke(alrin_cli, ['init'], env={'ALRIN_STATE_REPO': temp_directory.joinpath('nonexistent').as_posix()})
 
     assert result.stdout == ''
     assert result.stderr == f'Error: Invalid directory {temp_directory}/nonexistent.\n'
@@ -28,7 +28,7 @@ def test_init_nonexistent_dir(temp_directory: pathlib.Path, click_runner: CliRun
 
 def test_init_nonempty_dir(temp_directory: pathlib.Path, click_runner: CliRunner) -> None:
     temp_directory.joinpath('test').touch()
-    result = click_runner.invoke(alrin, ['init'], env={'ALRIN_STATE_REPO': temp_directory.as_posix()})
+    result = click_runner.invoke(alrin_cli, ['init'], env={'ALRIN_STATE_REPO': temp_directory.as_posix()})
 
     assert result.stdout == ''
     assert result.stderr == f'Error: Cannot initialize nonempty directory {temp_directory}.\n'

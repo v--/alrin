@@ -1,10 +1,10 @@
 import click
 
-from alrin.cli.commands.group import alrin
+from alrin.cli.commands.group import alrin_cli
 from alrin.workflow import initialize_shared_state
 
 
-@alrin.group()
+@alrin_cli.group()
 @click.pass_context
 @click.option('-v', '--verbose', is_flag=True)
 def bulk(ctx: click.Context, verbose: bool) -> None:

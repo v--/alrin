@@ -22,7 +22,7 @@ def with_cli_exception_handler() -> Generator[None]:
 @click.group()
 @click.pass_context
 @click.option('-v', '--verbose', is_flag=True)
-def alrin(ctx: click.Context, verbose: bool) -> None:
+def alrin_cli(ctx: click.Context, verbose: bool) -> None:
     check_binary_dependencies()
     ctx.meta['verbose'] = verbose
     ctx.with_resource(with_cli_exception_handler())

@@ -5,11 +5,11 @@ from alrin.logging import setup_logging
 from alrin.state import get_state_repo_path
 from alrin.workflow.state import initialize_state_repo
 
-from .group import alrin
+from .group import alrin_cli
 
 
 @click.option('-v', '--verbose', is_flag=True)
-@alrin.command()
+@alrin_cli.command()
 @click.pass_context
 def init(ctx: click.Context, verbose: bool) -> None:
     setup_logging(verbose or ctx.meta['verbose'])

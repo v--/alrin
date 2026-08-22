@@ -60,7 +60,7 @@ For Python packages, whose installation directory depends on the version of Pyth
 ["pkgbuild/python-djvulibre-python"]
 pkgver = "0.9.3"
 pkgrel = "3.314"
-add_python_suffix = true
+add_pkgrel_suffix = true
 builddate = 1783420854
 ```
 

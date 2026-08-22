@@ -1,4 +1,4 @@
-from .cli import alrin
+from .cli import alrin_cli
 
 
-__all__ = ['alrin']
+__all__ = ['alrin_cli']

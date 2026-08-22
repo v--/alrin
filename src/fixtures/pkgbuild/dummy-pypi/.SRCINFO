@@ -1,0 +1,14 @@
+pkgbase = dummy-pypi
+	pkgdesc = Dummy PyPI ALPM repository
+	pkgver = 1
+	pkgrel = 1
+	arch = any
+	license = MIT
+	checkdepends = python-pytest
+	makedepends = python-build
+	makedepends = python-installer
+	depends = python
+	source = https://files.pythonhosted.org/packages/source/d/dummy_pypi/dummy_pypi-1.tar.gz
+	sha256sums = SKIP
+
+pkgname = dummy-pypi

@@ -10,6 +10,10 @@ class AlrinRepositoryError(AlrinError):
     pass
 
 
+class AlrinJailError(AlrinError):
+    pass
+
+
 class AlrinPackageError(AlrinError):
     pass
 

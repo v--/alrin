@@ -1,0 +1,16 @@
+pkgname=alrin-test
+pkgver=1
+pkgrel=1
+pkgdesc="Alrin test repository"
+arch=(any)
+license=('MIT')
+source=()
+sha256sums=()
+
+build() {
+    echo "Building"
+}
+
+package() {
+    echo "Packaging"
+}

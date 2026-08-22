@@ -23,20 +23,20 @@ from alrin.workflow import (
 from .group import pkg as pkg_cli
 
 
-URL_PATTERN = 'https://aur.archlinux.org/{pkgname}.git'
 logger = logging.getLogger(__name__)
 
 
 @pkg_cli.command()
 @click.argument('pkgname')
 @click.option('-v', '--verbose', is_flag=True)
+@click.option('--url-template', type=str, default='https://aur.archlinux.org/{pkgname}.git')
 @click.pass_obj
 # ruff: ignore[unused-lambda-argument]
-@bind_logger_to_subject(logger, lambda shared, pkgname, verbose: pkgname)
-def add(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
+@bind_logger_to_subject(logger, lambda shared, pkgname, url_template, verbose: pkgname)
+def add(shared: AlrinSharedState, pkgname: str, url_template: str, verbose: bool) -> None:
     setup_logging(shared.verbose_logging or verbose)
 
-    url = URL_PATTERN.format(pkgname=pkgname)
+    url = url_template.format(pkgname=pkgname)
     resolver = AlrinPathResolver(shared.vault)
     pkg_path = resolver.get_pkg(pkgname)
     rel_path = resolver.relativize(pkg_path)
@@ -70,8 +70,8 @@ def add(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
         mut['pkgver'] = '0'
         mut['pkgrel'] = '0'
 
-        if any(str(dep) == 'python' for dep in srcinfo.base.dependencies) and click.confirm('Mark for adding a Python suffix?', True):
-            mut['add_python_suffix'] = True
+        if any(str(dep) == 'python' for dep in srcinfo.base.dependencies) and click.confirm('Add a Python version suffix to pkgrel?', True):
+            mut['add_pkgrel_suffix'] = True
 
     logger.info('Building.')
     pkg = AlrinPackageSource(shared, pkgname)

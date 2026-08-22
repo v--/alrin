@@ -6,6 +6,8 @@ from collections.abc import Generator
 import pytest
 from click.testing import CliRunner
 
+from fixtures.manager import AlrinFixtureManager
+
 
 @pytest.fixture
 def click_runner() -> CliRunner:
@@ -20,3 +22,8 @@ def temp_directory() -> Generator[pathlib.Path]:
         yield tmpdir
     finally:
         shutil.rmtree(tmpdir)
+
+
+@pytest.fixture
+def fixture_manager() -> AlrinFixtureManager:
+    return AlrinFixtureManager()

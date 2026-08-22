@@ -25,7 +25,7 @@ dependencies = [
 ]
 
 [project.scripts]
-alrin = "alrin.cli:alrin"
+alrin = "alrin.cli:alrin_cli"
 
 [dependency-groups]
 dev = [

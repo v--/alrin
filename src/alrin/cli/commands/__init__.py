@@ -3,7 +3,7 @@ from . import (
     keyring,
     pkg,
 )
-from .group import alrin
+from .group import alrin_cli
 
 
-__all__ = ['alrin']
+__all__ = ['alrin_cli']

@@ -43,7 +43,7 @@ class AlrinMetadata:
         return cls(
             version=AlrinPackageVersion.from_json(reader),
             builddate=cast('int | None', reader.get('builddate')),
-            add_python_suffix=cast('bool', reader.get('add_python_suffix', False)),
+            add_pkgrel_suffix=cast('bool', reader.get('add_pkgrel_suffix', False)),
             git_root=cast('str | None', reader.get('git_root')),
             note=cast('str | None', reader.get('note')),
         )
@@ -51,5 +51,5 @@ class AlrinMetadata:
     version: AlrinPackageVersion
     builddate: int | None
     git_root: str | None
-    add_python_suffix: bool
+    add_pkgrel_suffix: bool
     note: str | None

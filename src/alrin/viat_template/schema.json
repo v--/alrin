@@ -6,7 +6,7 @@
     "epoch": {"type": "number"},
     "builddate": {"type": "number"},
     "git_root": {"type": "string"},
-    "add_python_suffix": {"type": "boolean"},
+    "add_pkgrel_suffix": {"type": "boolean"},
     "note": {"type":"string"}
   },
   "required": ["pkgrel", "pkgver"]

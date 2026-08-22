@@ -1,4 +1,4 @@
-from .commands import alrin, init
+from .commands import alrin_cli, init
 
 
-__all__ = ['alrin']
+__all__ = ['alrin_cli']
