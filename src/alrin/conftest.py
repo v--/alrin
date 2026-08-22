@@ -20,7 +20,7 @@ def temp_path() -> Generator[pathlib.Path]:
 
 
 @pytest.fixture
-def temp_state_repo_path(temp_path: pathlib.Path) -> pathlib.Path:
+def temp_vault_path(temp_path: pathlib.Path) -> pathlib.Path:
     return temp_path / 'alrin-state'
 
 
@@ -30,11 +30,11 @@ def temp_sources_path(temp_path: pathlib.Path) -> pathlib.Path:
 
 
 @pytest.fixture
-def click_runner(temp_state_repo_path: pathlib.Path) -> CliRunner:
+def click_runner(temp_vault_path: pathlib.Path) -> CliRunner:
     return CliRunner(
         env={
             'ALRIN_SKIP_DEPENDENCY_CHECK': 'true',
-            'ALRIN_STATE_REPO': temp_state_repo_path.as_posix(),
+            'ALRIN_VAULT': temp_vault_path.as_posix(),
         },
     )
 

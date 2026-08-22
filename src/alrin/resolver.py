@@ -11,6 +11,9 @@ class AlrinPathResolver:
     def get_root(self) -> pathlib.Path:
         return self.vault.resolver.get_root()
 
+    def get_config(self) -> pathlib.Path:
+        return self.get_root() / 'alrin.toml'
+
     def get_pkg(self, name: str) -> pathlib.Path:
         return self.get_root() / 'pkgbuild' / name
 

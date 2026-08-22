@@ -1,27 +1,12 @@
 import pathlib
-import re
 import tarfile
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from typing import get_type_hints
 
 from alrin.exceptions import AlrinPackageMetadataError
-from alrin.metadata import AlrinPackageVersion
 from alrin.source import AlrinPackageSource
 from alrin.state import AlrinSharedState
-
-
-def parse_version(version_str: str) -> AlrinPackageVersion:
-    if match := re.match(r'((?P<epoch>\d+):)?(?P<pkgver>\d+)-(?P<pkgrel>\d+(.\d+)?)', version_str):
-        groups = match.groupdict()
-
-        return AlrinPackageVersion(
-            pkgver=groups['pkgver'],
-            pkgrel=groups['pkgrel'],
-            epoch=int(groups['epoch']) if groups.get('epoch') else None,
-        )
-
-    raise AlrinPackageMetadataError(f'Could not parse version {version_str!r}')
 
 
 @dataclass(frozen=True)
@@ -31,9 +16,6 @@ class AlrinBuildPkgInfo:
     pkgver: str
     pkgarch: str
     builddate: int
-
-    def parse_version(self) -> AlrinPackageVersion:
-        return parse_version(self.pkgver)
 
 
 class AlrinBuiltPackage:

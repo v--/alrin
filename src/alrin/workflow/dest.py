@@ -7,8 +7,8 @@ import click
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import bind_logger_to_subject
-from alrin.metadata import AlrinMetadata
-from alrin.pkginfo import AlrinBuiltPackage, get_existing_built, get_newly_built, parse_version
+from alrin.metadata import AlrinPkgbuildMetadata, AlrinPackageVersion
+from alrin.pkginfo import AlrinBuiltPackage, get_existing_built, get_newly_built
 from alrin.source import AlrinPackageSource
 
 from .gnupg import create_signature_file
@@ -35,7 +35,7 @@ def update_version_from_build_files(pkg: AlrinPackageSource) -> None:
         raise AlrinPackageMetadataError(f'Multiple versions of the same package {pkg}')
 
     raw_version = next(iter(versions))
-    pkg.version = parse_version(raw_version)
+    pkg.version = AlrinPackageVersion.from_string(raw_version)
 
 
 @bind_logger_to_subject(logger, lambda pkg: pkg.pkgname)
@@ -125,6 +125,6 @@ def process_built_files(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
             mut['epoch'] = pkg.version.epoch
 
         mut['builddate'] = builddate
-        pkg.viat_meta = AlrinMetadata.from_json(mut)
+        pkg.viat_meta = AlrinPkgbuildMetadata.from_json(mut)
 
     return result

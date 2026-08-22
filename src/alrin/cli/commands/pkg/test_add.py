@@ -12,12 +12,12 @@ from fixtures.read_database import read_database
 
 
 def test_add_success(
-    temp_state_repo_path: pathlib.Path,
+    temp_vault_path: pathlib.Path,
     temp_sources_path: pathlib.Path,
     fixture_manager: AlrinFixtureManager,
     click_runner: CliRunner,
 ) -> None:
-    fixture_manager.initialize_state_repo(temp_state_repo_path)
+    fixture_manager.initialize_alrin_vault(temp_vault_path)
     fixture_manager.source.initialize_at('dummy', temp_sources_path)
 
     with pytest.MonkeyPatch.context() as monkeypatch:
@@ -29,9 +29,9 @@ def test_add_success(
         )
 
     assert 'Error' not in result.stderr
-    assert temp_state_repo_path.joinpath('pkgbuild', 'dummy', 'PKGBUILD').exists()
+    assert temp_vault_path.joinpath('pkgbuild', 'dummy', 'PKGBUILD').exists()
 
-    vault = ViatVault(temp_state_repo_path)
+    vault = ViatVault(temp_vault_path)
 
     with vault.storage as conn, conn.get_reader('pkgbuild/dummy') as reader:
         assert reader['pkgver'] == '1'
@@ -39,7 +39,7 @@ def test_add_success(
         assert 'add_pkgrel_suffix' not in reader
 
     db_packages = read_database(
-        temp_state_repo_path.joinpath('pkgdest', 'any', 'ivasilev.db'),
+        temp_vault_path.joinpath('pkgdest', 'any', 'alrin.db.tar'),
     )
 
     assert len(db_packages) == 1
@@ -48,12 +48,12 @@ def test_add_success(
 
 
 def test_add_invalid_path(
-    temp_state_repo_path: pathlib.Path,
+    temp_vault_path: pathlib.Path,
     temp_sources_path: pathlib.Path,
     fixture_manager: AlrinFixtureManager,
     click_runner: CliRunner,
 ) -> None:
-    fixture_manager.initialize_state_repo(temp_state_repo_path)
+    fixture_manager.initialize_alrin_vault(temp_vault_path)
 
     with pytest.MonkeyPatch.context() as monkeypatch:
         fixture_manager.mock_jail_manager(monkeypatch)
@@ -65,17 +65,17 @@ def test_add_invalid_path(
 
     assert 'Removing invalid repository' in result.stderr
 
-    git_repo = pygit2.Repository(temp_state_repo_path)
+    git_repo = pygit2.Repository(temp_vault_path)
     assert len(git_repo.index) == 0
 
 
 def test_add_bad_pkgbuild(
-    temp_state_repo_path: pathlib.Path,
+    temp_vault_path: pathlib.Path,
     temp_sources_path: pathlib.Path,
     fixture_manager: AlrinFixtureManager,
     click_runner: CliRunner,
 ) -> None:
-    fixture_manager.initialize_state_repo(temp_state_repo_path)
+    fixture_manager.initialize_alrin_vault(temp_vault_path)
     fixture_manager.source.initialize_at('bad-pkgbuild', temp_sources_path)
 
     with pytest.MonkeyPatch.context() as monkeypatch:
@@ -84,24 +84,24 @@ def test_add_bad_pkgbuild(
         result = click_runner.invoke(
             alrin_cli,
             ['pkg', 'add', 'bad-pkgbuild', '--url-template', f'{temp_sources_path}/{{pkgname}}'],
-            env={'ALRIN_STATE_REPO': temp_state_repo_path.as_posix()},
+            env={'ALRIN_VAULT': temp_vault_path.as_posix()},
         )
 
     assert 'Error reading .SRCINFO' in result.stderr
 
-    git_repo = pygit2.Repository(temp_state_repo_path)
+    git_repo = pygit2.Repository(temp_vault_path)
     git_repo.index.remove('.gitmodules')
 
     assert len(git_repo.index) == 0
 
 
 def test_add_pypi_success(
-    temp_state_repo_path: pathlib.Path,
+    temp_vault_path: pathlib.Path,
     temp_sources_path: pathlib.Path,
     fixture_manager: AlrinFixtureManager,
     click_runner: CliRunner,
 ) -> None:
-    fixture_manager.initialize_state_repo(temp_state_repo_path)
+    fixture_manager.initialize_alrin_vault(temp_vault_path)
     fixture_manager.source.initialize_at('python-dummy', temp_sources_path)
 
     with pytest.MonkeyPatch.context() as monkeypatch:
@@ -115,7 +115,7 @@ def test_add_pypi_success(
 
     assert 'Error' not in result.stderr
 
-    vault = ViatVault(temp_state_repo_path)
+    vault = ViatVault(temp_vault_path)
 
     with vault.storage as conn, conn.get_reader('pkgbuild/python-dummy') as reader:
         assert reader['pkgver'] == '1'
@@ -123,7 +123,7 @@ def test_add_pypi_success(
         assert reader['add_pkgrel_suffix'] is True
 
     db_packages = read_database(
-        temp_state_repo_path.joinpath('pkgdest', 'any', 'ivasilev.db'),
+        temp_vault_path.joinpath('pkgdest', 'any', 'alrin.db.tar'),
     )
 
     assert len(db_packages) == 1
@@ -132,12 +132,12 @@ def test_add_pypi_success(
 
 
 def test_add_subpackages_success(
-    temp_state_repo_path: pathlib.Path,
+    temp_vault_path: pathlib.Path,
     temp_sources_path: pathlib.Path,
     fixture_manager: AlrinFixtureManager,
     click_runner: CliRunner,
 ) -> None:
-    fixture_manager.initialize_state_repo(temp_state_repo_path)
+    fixture_manager.initialize_alrin_vault(temp_vault_path)
     fixture_manager.source.initialize_at('dummy-subpackages', temp_sources_path)
 
     with pytest.MonkeyPatch.context() as monkeypatch:
@@ -150,14 +150,14 @@ def test_add_subpackages_success(
 
     assert 'Error' not in result.stderr
 
-    vault = ViatVault(temp_state_repo_path)
+    vault = ViatVault(temp_vault_path)
 
     with vault.storage as conn, conn.get_reader('pkgbuild/dummy-subpackages') as reader:
         assert reader['pkgver'] == '1'
         assert reader['pkgrel'] == '1'
 
     db_packages = read_database(
-        temp_state_repo_path.joinpath('pkgdest', 'any', 'ivasilev.db'),
+        temp_vault_path.joinpath('pkgdest', 'any', 'alrin.db.tar'),
     )
 
     assert len(db_packages) == 2

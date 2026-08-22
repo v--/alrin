@@ -6,7 +6,7 @@ import pygit2
 import pytest
 
 from alrin.workflow.jail import AlrinJailManager
-from alrin.workflow.state import initialize_state_repo
+from alrin.workflow.state import initialize_alrin_vault
 from fixtures.git import git_commit
 from fixtures.mock_makepkg import mock_makepkg
 from fixtures.source import SourceFixtureManager
@@ -18,9 +18,9 @@ class AlrinFixtureManager:
     def __init__(self) -> None:
         self.source = SourceFixtureManager()
 
-    def initialize_state_repo(self, path: pathlib.Path) -> None:
+    def initialize_alrin_vault(self, path: pathlib.Path) -> None:
         path.mkdir()
-        initialize_state_repo(path)
+        initialize_alrin_vault(path)
 
         repo = pygit2.init_repository(path)
         repo.index.add_all()

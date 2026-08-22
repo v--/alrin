@@ -2,9 +2,9 @@
 
 Alrin (**A**rch **L**inux **r**epository for [**i**vasilev.**n**et](https://ivasilev.net)) is a bunch of code that grew out of me managing [my](https://ivasilev.net/pacman) [pacman](https://pacman.archlinux.page/)/[ALPM](https://alpm.archlinux.page/) repository.
 
-In short, this tool needs a repository for managing state, say `alrin-state`, determined by the `ALRIN_STATE_REPO` environment variable or the working directory as a fallback. Packages with `PKGBUILD`/`.SRCINFO` files are stored as git submodules in `alrin-state/pkgbuild`, which allows easily checking for updates by simply pulling. [Viat](https://github.com/v--/viat) is used to store versions and some other metadata --- see below.
+In short, this tool allows describing an ALPM repository in a git-friendly format. It operates a [Viat](https://github.com/v--/viat) vault in either the current directory or the one specified by the `ALRIN_VAULT` environment variable. Packages with `PKGBUILD`/`.SRCINFO` files are stored as git submodules in `$ALRIN_VAULT/pkgbuild`.
 
-The builds use [`makechrootpkg`](https://man.archlinux.org/man/makechrootpkg.1) and the resulting files are put in the `alrin-state/pkgdest` directory, along with the package databases.
+The builds use [`makechrootpkg`](https://man.archlinux.org/man/makechrootpkg.1) and the resulting files are put in the `$ALRIN_VAULT/pkgdest` directory, along with the package databases.
 
 > [!NOTE]
 > It is likely that every person managing a pacman repository has needs different from mine. If you find this tool useful, you can always contact me or open a pull request with whatever changes you need.
@@ -17,13 +17,13 @@ To use `alrin` without cloning the repository, you can utilize [`pipx`](https://
 pipx install git+https://github.com/v--/alrin
 ```
 
-A new state repository can be initialized by running `alrin init` in an empty directory.
+A new vault can be initialized by running `alrin init <dbname>` in an empty directory. Some basic configuration can then be done by editing `$ALRIN_STATE/alrin.toml`.
 
-You can optionally copy or symlink a `pacman.conf` file in `$ALRIN_STATE_REPO` and it will get synchronized before very build. To feed the built repository to `makechrootpkg`, append
+You can optionally copy or symlink a `pacman.conf` file in `$ALRIN_VAULT` and it will get synchronized before very build. To feed the existing repository to `makechrootpkg`, append
 
 ```ini
 [<repo name>]
-Server = file:///<state repository path>/pkgdest/$arch
+Server = file:///<vault path>/pkgdest/$arch
 ```
 
 The following can then register `<package>` from the AUR:
@@ -45,6 +45,26 @@ alrin pkg remove <package>
 ```
 
 There are two more commands --- see below.
+
+## GPG Keyring
+
+Alrin creates a custom keyring at `$ALRIN_VAULT/keyring` that is used during the build. It can be managed via
+
+```shell
+GNUPGHOME=$ALRIN_VAULT/keyring gpg ...
+```
+
+This directory is intended to be ignored by version control. The `$ALRIN_VAULT/keyring_backup.asc` file can be used to backup and restore its public keys via
+
+```shell
+alrin keyring backup
+```
+
+and
+
+```shell
+alrin keyring restore
+```
 
 ## Some examples
 
@@ -80,23 +100,3 @@ builddate = 1781374235
 ```
 
 Here, `pkgbuild/mkinitcpio-growrootfs` is a symlink to `../ec2-packages/mkinitcpio-growrootfs`, where `ec2-packages` is [this repository](https://git.uplinklabs.net/steven/ec2-packages). The role of the `git_root` attribute should be obvious.
-
-## GPG Keyring
-
-Alrin creates a custom keyring at `$ALRIN_STATE_REPO/keyring` that is used during the build. It can be managed via
-
-```shell
-GNUPGHOME=$ALRIN_STATE_REPO/keyring gpg ...
-```
-
-This directory is intended to be ignored by version control. The `$ALRIN_STATE_REPO/keyring_backup.asc` file can be used to backup and restore its public keys via
-
-```shell
-alrin keyring backup
-```
-
-and
-
-```shell
-alrin keyring restore
-```

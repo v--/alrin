@@ -8,7 +8,7 @@ from alpm.type_aliases import SourceInfo
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import bind_logger_to_subject
-from alrin.metadata import AlrinMetadata, AlrinPackageVersion
+from alrin.metadata import AlrinPkgbuildMetadata, AlrinPackageVersion
 from alrin.state import AlrinSharedState
 from alrin.wrappers import alpm_srcinfo_create
 
@@ -48,7 +48,7 @@ class AlrinPackageSource:
 
     repo: pygit2.Repository
     version: AlrinPackageVersion
-    viat_meta: AlrinMetadata
+    viat_meta: AlrinPkgbuildMetadata
 
     def __init__(self, shared: AlrinSharedState, pkgname: str) -> None:
         self.shared = shared
@@ -59,7 +59,7 @@ class AlrinPackageSource:
             raise AlrinPackageMetadataError(f'Unrecognized package name {pkgname}')
 
         with shared.vault.storage as conn, conn.get_reader(pkg_path) as reader:
-            self.viat_meta = AlrinMetadata.from_json(reader)
+            self.viat_meta = AlrinPkgbuildMetadata.from_json(reader)
 
         git_path = pkg_path if self.viat_meta.git_root is None else shared.resolver.get_root() / self.viat_meta.git_root
 

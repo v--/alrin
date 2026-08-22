@@ -6,7 +6,11 @@ class AlrinError(AlrinException):
     pass
 
 
-class AlrinRepositoryError(AlrinError):
+class AlrinVaultError(AlrinError):
+    pass
+
+
+class AlrinConfigurationError(AlrinError):
     pass
 
 
