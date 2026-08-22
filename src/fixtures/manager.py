@@ -8,7 +8,7 @@ import pytest
 from alrin.workflow.jail import AlrinJailManager
 from alrin.workflow.state import initialize_state_repo
 from fixtures.git import git_commit
-from fixtures.makepkg import mock_makepkg
+from fixtures.mock_makepkg import mock_makepkg
 from fixtures.source import SourceFixtureManager
 
 

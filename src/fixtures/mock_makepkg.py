@@ -15,7 +15,14 @@ def mock_makepkg(self, pkg: AlrinPackageSource, builddate: int | None = None) ->
 
     for package in srcinfo.packages:
         for arch in package.architectures or srcinfo.base.architectures:
-            mock_makepkg_package(pkg, srcinfo.base, package, str(arch), builddate)
+            mock_makepkg_package(
+                pkg,
+                srcinfo.base,
+                package,
+                str(arch),
+                is_split=len(srcinfo.packages) > 1,
+                builddate=builddate,
+            )
 
 
 def mock_makepkg_package(
@@ -23,13 +30,14 @@ def mock_makepkg_package(
     base: PackageBase,
     package: Package,
     arch: str,
+    is_split: bool = False,
     builddate: int | None = None,
 ) -> None:
     output_file = pkg.get_abs_path().joinpath(f'{package.name if package else base.name}-{pkg.version}-{arch}.pkg.tar')
 
     with tarfile.open(output_file, 'w') as file:
         pkginfo_data = {
-            'xdata': 'pkgtype=split' if package else 'pkgtype=pkg',
+            'xdata': 'pkgtype=split' if is_split else 'pkgtype=pkg',
             'pkgbase': pkg.pkgname,
             'pkgname': str(package.name or base.name),
             'pkgdesc': str(package.description or base.description),

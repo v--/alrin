@@ -8,6 +8,7 @@ from viat import ViatVault
 from alrin.cli import alrin_cli
 from alrin.workflow.pkgbuild import PYTHON_VERSION_SUFFIX
 from fixtures.manager import AlrinFixtureManager
+from fixtures.read_database import read_database
 
 
 def test_add_success(
@@ -36,6 +37,14 @@ def test_add_success(
         assert reader['pkgver'] == '1'
         assert reader['pkgrel'] == '1'
         assert 'add_pkgrel_suffix' not in reader
+
+    db_packages = read_database(
+        temp_state_repo_path.joinpath('pkgdest', 'any', 'ivasilev.db'),
+    )
+
+    assert len(db_packages) == 1
+    assert db_packages[0].name == 'dummy'
+    assert db_packages[0].version == '1-1'
 
 
 def test_add_invalid_path(
@@ -113,6 +122,14 @@ def test_add_pypi_success(
         assert reader['pkgrel'] == '1' + PYTHON_VERSION_SUFFIX
         assert reader['add_pkgrel_suffix'] is True
 
+    db_packages = read_database(
+        temp_state_repo_path.joinpath('pkgdest', 'any', 'ivasilev.db'),
+    )
+
+    assert len(db_packages) == 1
+    assert db_packages[0].name == 'python-dummy'
+    assert db_packages[0].version == '1-1' + PYTHON_VERSION_SUFFIX
+
 
 def test_add_subpackages_success(
     temp_state_repo_path: pathlib.Path,
@@ -138,3 +155,13 @@ def test_add_subpackages_success(
     with vault.storage as conn, conn.get_reader('pkgbuild/dummy-subpackages') as reader:
         assert reader['pkgver'] == '1'
         assert reader['pkgrel'] == '1'
+
+    db_packages = read_database(
+        temp_state_repo_path.joinpath('pkgdest', 'any', 'ivasilev.db'),
+    )
+
+    assert len(db_packages) == 2
+    assert db_packages[0].name == 'a'
+    assert db_packages[0].version == '1-1'
+    assert db_packages[1].name == 'b'
+    assert db_packages[1].version == '1-1'
