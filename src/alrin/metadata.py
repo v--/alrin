@@ -35,6 +35,12 @@ class AlrinPackageVersion:
 
         return self_epoch < other_epoch or self.pkgver < other.pkgver or self.pkgrel < other.pkgrel
 
+    def __str__(self) -> str:
+        if self.epoch:
+            return f'{self.epoch}:{self.pkgver}-{self.pkgrel}'
+
+        return f'{self.pkgver}-{self.pkgrel}'
+
 
 @dataclass(frozen=True)
 class AlrinMetadata:

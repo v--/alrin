@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 BINARY_DEPENDENCIES = [
     'which',
+    'alpm-srcinfo',
     'repo-add', 'repo-remove',
     'arch-nspawn', 'mkarchroot', 'makechrootpkg',
 ]
@@ -111,6 +112,8 @@ def repo_add(
     quiet: bool = False,
     sign: bool = False,
     cwd: pathlib.Path | None = None,
+    # ruff: ignore[invalid-argument-name]
+    GNUPGHOME: pathlib.Path | None = None,
 ) -> None:
     option_args = list[str]()
 
@@ -119,6 +122,11 @@ def repo_add(
 
     if sign:
         option_args.append('--sign')
+
+    env = dict[str, str]()
+
+    if GNUPGHOME is not None:
+        env['GNUPGHOME'] = GNUPGHOME.as_posix()
 
     subprocess.run(
         [
@@ -137,6 +145,8 @@ def repo_remove(
     quiet: bool = False,
     sign: bool = False,
     cwd: pathlib.Path | None = None,
+    # ruff: ignore[invalid-argument-name]
+    GNUPGHOME: pathlib.Path | None = None,
 ) -> None:
     option_args = list[str]()
 
@@ -146,6 +156,11 @@ def repo_remove(
     if sign:
         option_args.append('--sign')
 
+    env = dict[str, str]()
+
+    if GNUPGHOME is not None:
+        env['GNUPGHOME'] = GNUPGHOME.as_posix()
+
     subprocess.run(
         [
             'repo-remove', *option_args, path_to_db.as_posix(),
@@ -153,4 +168,19 @@ def repo_remove(
         ],
         check=True,
         cwd=cwd,
+        env=env,
     )
+
+
+def alpm_srcinfo_create(
+    pkgbuild_path: pathlib.Path,
+    srcinfo_path: pathlib.Path,
+) -> None:
+    with srcinfo_path.open('wb') as srcinfo_file:
+        subprocess.run(
+            [
+                'alpm-srcinfo', 'create', pkgbuild_path.as_posix(),
+            ],
+            check=True,
+            stdout=srcinfo_file,
+        )

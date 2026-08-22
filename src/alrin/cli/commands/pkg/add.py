@@ -3,12 +3,11 @@ import shutil
 
 import click
 import pygit2
-from alpm.alpm_srcinfo import SourceInfoError, source_info_from_file
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import bind_logger_to_subject, setup_logging
 from alrin.resolver import AlrinPathResolver
-from alrin.source import AlrinPackageSource
+from alrin.source import AlrinPackageSource, read_srcinfo_with_retry
 from alrin.state import AlrinSharedState
 from alrin.workflow import (
     alpmdb_add_packages,
@@ -57,13 +56,13 @@ def add(shared: AlrinSharedState, pkgname: str, url_template: str, verbose: bool
         raise AlrinPackageMetadataError(f'Invalid git repository at {url!r}') from err
 
     try:
-        srcinfo = source_info_from_file(pkg_path.joinpath('.SRCINFO'))
-    except SourceInfoError as err:
+        srcinfo = read_srcinfo_with_retry(shared, pkgname)
+    except AlrinPackageMetadataError:
         logger.exception('Error reading .SRCINFO')
         logger.info(f'Removing invalid repository from {rel_path}.')
         shutil.rmtree(rel_path, ignore_errors=True)
         unregister_submodule(shared, pkgname)
-        raise AlrinPackageMetadataError(f'Could not read .SRCINFO at {rel_path}') from err
+        raise
 
     logger.info('Adding mock Viat metadata.')
     with shared.vault.storage as conn, conn.get_mutator(pkg_path) as mut:
@@ -75,6 +74,7 @@ def add(shared: AlrinSharedState, pkgname: str, url_template: str, verbose: bool
 
     logger.info('Building.')
     pkg = AlrinPackageSource(shared, pkgname)
+
     preprocess_pkgbuild(pkg)
     makepkg_inside_jail(pkg)
     postprocess_pkgbuild(pkg)

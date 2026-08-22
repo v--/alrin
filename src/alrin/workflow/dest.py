@@ -90,7 +90,10 @@ def process_built_files(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
             arch_path.mkdir(parents=True, exist_ok=True)
 
             built.path.copy(arch_path / built.path.name)
-            built.get_signature_path().copy(arch_path / (built.path.name + '.sig'))
+
+            with contextlib.suppress(FileNotFoundError):
+                built.get_signature_path().copy(arch_path / (built.path.name + '.sig'))
+
             result.append(
                 AlrinBuiltPackage(arch_path / built.path.name),
             )

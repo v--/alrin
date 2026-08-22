@@ -1,4 +1,5 @@
 # ruff: file-ignore[no-self-use]
+
 import pathlib
 
 import pygit2
@@ -7,14 +8,15 @@ import pytest
 from alrin.workflow.jail import AlrinJailManager
 from alrin.workflow.state import initialize_state_repo
 from fixtures.git import git_commit
-from fixtures.pkgbuild import PkgbuildFixtureManager
+from fixtures.makepkg import mock_makepkg
+from fixtures.source import SourceFixtureManager
 
 
 class AlrinFixtureManager:
-    pkgbuild: PkgbuildFixtureManager
+    source: SourceFixtureManager
 
     def __init__(self) -> None:
-        self.pkgbuild = PkgbuildFixtureManager()
+        self.source = SourceFixtureManager()
 
     def initialize_state_repo(self, path: pathlib.Path) -> None:
         path.mkdir()
@@ -28,5 +30,5 @@ class AlrinFixtureManager:
         # ruff: disable[unused-lambda-argument]
         monkeypatch.setattr(AlrinJailManager, 'create_new', lambda self: None)
         monkeypatch.setattr(AlrinJailManager, 'update_packages', lambda self: None)
-        monkeypatch.setattr(AlrinJailManager, 'makepkg', lambda self, pkg, builddate: None)
+        monkeypatch.setattr(AlrinJailManager, 'makepkg', mock_makepkg)
         # ruff: enable[unused-lambda-argument]

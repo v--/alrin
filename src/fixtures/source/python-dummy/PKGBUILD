@@ -1,11 +1,12 @@
-pkgname=alrin-test
+pkgname=python-dummy
 pkgver=1
 pkgrel=1
-pkgdesc="Alrin test repository"
+pkgdesc="Dummy Python ALPM repository"
 arch=(any)
 license=('MIT')
 source=()
 sha256sums=()
+depends=(python)
 
 build() {
     echo "Building"

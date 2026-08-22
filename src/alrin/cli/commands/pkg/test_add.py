@@ -17,7 +17,7 @@ def test_add_success(
     click_runner: CliRunner,
 ) -> None:
     fixture_manager.initialize_state_repo(temp_state_repo_path)
-    fixture_manager.pkgbuild.initialize_at('dummy', temp_sources_path)
+    fixture_manager.source.initialize_at('dummy', temp_sources_path)
 
     with pytest.MonkeyPatch.context() as monkeypatch:
         fixture_manager.mock_jail_manager(monkeypatch)
@@ -33,8 +33,8 @@ def test_add_success(
     vault = ViatVault(temp_state_repo_path)
 
     with vault.storage as conn, conn.get_reader('pkgbuild/dummy') as reader:
-        assert reader['pkgver'] == '0'
-        assert reader['pkgrel'] == '0'
+        assert reader['pkgver'] == '1'
+        assert reader['pkgrel'] == '1'
         assert 'add_pkgrel_suffix' not in reader
 
 
@@ -60,21 +60,21 @@ def test_add_invalid_path(
     assert len(git_repo.index) == 0
 
 
-def test_add_no_scrinfo(
+def test_add_bad_pkgbuild(
     temp_state_repo_path: pathlib.Path,
     temp_sources_path: pathlib.Path,
     fixture_manager: AlrinFixtureManager,
     click_runner: CliRunner,
 ) -> None:
     fixture_manager.initialize_state_repo(temp_state_repo_path)
-    fixture_manager.pkgbuild.initialize_at('no_srcinfo', temp_sources_path)
+    fixture_manager.source.initialize_at('bad-pkgbuild', temp_sources_path)
 
     with pytest.MonkeyPatch.context() as monkeypatch:
         fixture_manager.mock_jail_manager(monkeypatch)
 
         result = click_runner.invoke(
             alrin_cli,
-            ['pkg', 'add', 'no_srcinfo', '--url-template', f'{temp_sources_path}/{{pkgname}}'],
+            ['pkg', 'add', 'bad-pkgbuild', '--url-template', f'{temp_sources_path}/{{pkgname}}'],
             env={'ALRIN_STATE_REPO': temp_state_repo_path.as_posix()},
         )
 
@@ -93,14 +93,14 @@ def test_add_pypi_success(
     click_runner: CliRunner,
 ) -> None:
     fixture_manager.initialize_state_repo(temp_state_repo_path)
-    fixture_manager.pkgbuild.initialize_at('dummy-pypi', temp_sources_path)
+    fixture_manager.source.initialize_at('python-dummy', temp_sources_path)
 
     with pytest.MonkeyPatch.context() as monkeypatch:
         fixture_manager.mock_jail_manager(monkeypatch)
 
         result = click_runner.invoke(
             alrin_cli,
-            ['pkg', 'add', 'dummy-pypi', '--url-template', f'{temp_sources_path}/{{pkgname}}'],
+            ['pkg', 'add', 'python-dummy', '--url-template', f'{temp_sources_path}/{{pkgname}}'],
             input=b'yes\n',
         )
 
@@ -108,11 +108,11 @@ def test_add_pypi_success(
 
     vault = ViatVault(temp_state_repo_path)
 
-    with vault.storage as conn, conn.get_reader('pkgbuild/dummy-pypi') as reader:
+    with vault.storage as conn, conn.get_reader('pkgbuild/python-dummy') as reader:
         assert reader['add_pkgrel_suffix'] is True
 
     pkgrel = find_pkgbuild_value(
-        temp_state_repo_path.joinpath('pkgbuild', 'dummy-pypi', 'PKGBUILD').read_text(),
+        temp_state_repo_path.joinpath('pkgbuild', 'python-dummy', 'PKGBUILD').read_text(),
         'pkgrel',
     )
 

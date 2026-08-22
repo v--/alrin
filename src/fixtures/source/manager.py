@@ -9,10 +9,10 @@ from alrin.workflow.state import copy_resource_traversible
 from fixtures.git import git_commit
 
 
-class PkgbuildFixtureManager:
+class SourceFixtureManager:
     def initialize_at(self, name: str, target_path: pathlib.Path) -> None:
         copy_resource_traversible(
-            importlib.resources.files('fixtures.pkgbuild').joinpath(name),
+            importlib.resources.files('fixtures.source').joinpath(name),
             target_path.joinpath(name),
         )
 

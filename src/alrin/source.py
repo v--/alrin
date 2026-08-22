@@ -1,17 +1,45 @@
 import logging
 import pathlib
+import subprocess
 
 import pygit2
 from alpm.alpm_srcinfo import SourceInfoError, source_info_from_file
 from alpm.type_aliases import SourceInfo
 
 from alrin.exceptions import AlrinPackageMetadataError
-from alrin.logging import inject_subject
+from alrin.logging import bind_logger_to_subject
 from alrin.metadata import AlrinMetadata, AlrinPackageVersion
 from alrin.state import AlrinSharedState
+from alrin.wrappers import alpm_srcinfo_create
 
 
 logger = logging.getLogger(__name__)
+
+
+# ruff: ignore[unused-lambda-argument]
+@bind_logger_to_subject(logger, lambda shared, pkgname: pkgname)
+def read_srcinfo_with_retry(shared: AlrinSharedState, pkgname: str) -> SourceInfo:
+    pkg_path = shared.resolver.get_pkg(pkgname)
+
+    try:
+        return source_info_from_file(pkg_path / '.SRCINFO')
+    except SourceInfoError:
+        pass
+
+    logger.warning('Could not read .SRCINFO. Trying to recreate it...')
+
+    try:
+        alpm_srcinfo_create(
+            pkg_path / 'PKGBUILD',
+            pkg_path / '.SRCINFO',
+        )
+    except subprocess.CalledProcessError as err:
+        raise AlrinPackageMetadataError('Failed to recreate .SRCINFO') from err
+
+    try:
+        return source_info_from_file(pkg_path / '.SRCINFO')
+    except SourceInfoError as err:
+        raise AlrinPackageMetadataError('Failed to read recreated .SRCINFO') from err
 
 
 class AlrinPackageSource:
@@ -41,17 +69,7 @@ class AlrinPackageSource:
             git_rel_path = shared.resolver.relativize(git_path)
             raise AlrinPackageMetadataError(f'Path {git_rel_path} is not a valid git repository') from err
 
-        try:
-            self.version = AlrinPackageVersion.from_srcinfo(self.read_srcinfo())
-        except SourceInfoError:
-            with inject_subject(logger, pkgname):
-                logger.info('Could not read .SRCINFO. Using PKGBUILD instead.')
-
-            with self.get_abs_path().joinpath('PKGBUILD').open() as file:
-                # ruff: ignore[import-outside-top-level]
-                from alrin.workflow.pkgbuild import extract_pkgbuild_version
-
-                self.version = extract_pkgbuild_version(file)
+        self.version = AlrinPackageVersion.from_srcinfo(self.read_srcinfo())
 
     def get_abs_path(self) -> pathlib.Path:
         return self.shared.resolver.get_pkg(self.pkgname)
@@ -60,4 +78,4 @@ class AlrinPackageSource:
         return self.shared.vault.resolver.relativize(self.get_abs_path())
 
     def read_srcinfo(self) -> SourceInfo:
-        return source_info_from_file(self.get_abs_path().joinpath('.SRCINFO'))
+        return read_srcinfo_with_retry(self.shared, self.pkgname)
