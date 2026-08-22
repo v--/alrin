@@ -5,9 +5,10 @@ from collections.abc import Sequence
 
 import click
 
-from alrin.buildinfo import AlrinBuiltPackage, get_existing_built, get_newly_built
+from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import bind_logger_to_subject
 from alrin.metadata import AlrinMetadata
+from alrin.pkginfo import AlrinBuiltPackage, get_existing_built, get_newly_built, parse_version
 from alrin.source import AlrinPackageSource
 
 from .gnupg import create_signature_file
@@ -21,6 +22,20 @@ def remove_built_file(built: AlrinBuiltPackage) -> None:
 
     with contextlib.suppress(FileNotFoundError):
         built.get_signature_path().unlink()
+
+
+@bind_logger_to_subject(logger, lambda pkg: pkg.pkgname)
+def update_version_from_build_files(pkg: AlrinPackageSource) -> None:
+    versions = {built.info.pkgver for built in get_newly_built(pkg)}
+
+    if len(versions) == 0:
+        raise AlrinPackageMetadataError('No files build to extract the version from')
+
+    if len(versions) > 1:
+        raise AlrinPackageMetadataError(f'Multiple versions of the same package {pkg}')
+
+    raw_version = next(iter(versions))
+    pkg.version = parse_version(raw_version)
 
 
 @bind_logger_to_subject(logger, lambda pkg: pkg.pkgname)

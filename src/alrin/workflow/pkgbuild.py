@@ -1,10 +1,7 @@
-import ast
 import logging
 import re
 import sys
-from typing import TextIO
 
-from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import inject_subject
 from alrin.metadata import AlrinPackageVersion
 from alrin.source import AlrinPackageSource
@@ -14,60 +11,9 @@ PYTHON_VERSION_SUFFIX = f'.{sys.version_info.major}{sys.version_info.minor}'
 logger = logging.getLogger(__name__)
 
 
-def geneate_pkgbuild_regex(key: str) -> re.Pattern:
-    return re.compile(rf'{key}=(?P<value>.+)')
-
-
-def find_pkgbuild_value(pkgbuild_text: str, key: str) -> str | None:
-    if match := re.search(geneate_pkgbuild_regex(key), pkgbuild_text):
-        return match.group('value')
-
-    return None
-
-
-def find_pkgbuild_string(pkgbuild_text: str, key: str) -> str | None:
-    if raw_value := find_pkgbuild_value(pkgbuild_text, key):
-        try:
-            value = ast.literal_eval(raw_value)
-
-            if isinstance(value, str):
-                return value
-            else:
-                return raw_value
-        except ValueError:
-            return raw_value
-
-    return None
-
-
-def extract_pkgbuild_version(file: TextIO) -> AlrinPackageVersion:
-    pkgbuild_text = file.read()
-    pkgver = find_pkgbuild_string(pkgbuild_text, 'pkgver')
-
-    if pkgver is None:
-        raise AlrinPackageMetadataError('Could not read pkgver from PKGBUILD')
-
-    pkgrel = find_pkgbuild_string(pkgbuild_text, 'pkgrel')
-
-    if pkgrel is None:
-        raise AlrinPackageMetadataError('Could not read pkgver from PKGBUILD')
-
-    epoch = find_pkgbuild_string(pkgbuild_text, 'epoch')
-
-    return AlrinPackageVersion(
-        pkgver=pkgver,
-        pkgrel=pkgrel,
-        epoch=int(epoch) if epoch else None,
-    )
-
-
 def preprocess_pkgbuild(pkg: AlrinPackageSource) -> None:
     pkgbuild_path = pkg.get_abs_path().joinpath('PKGBUILD')
-
-    with pkg.get_abs_path().joinpath('PKGBUILD').open() as file:
-        pkgbuild_version = extract_pkgbuild_version(file)
-
-    pkgrel = pkgbuild_version.pkgrel
+    pkgrel = pkg.version.pkgrel
 
     if pkg.viat_meta.add_pkgrel_suffix and not pkgrel.endswith(PYTHON_VERSION_SUFFIX):
         with inject_subject(logger, pkg.pkgname):
@@ -80,12 +26,7 @@ def preprocess_pkgbuild(pkg: AlrinPackageSource) -> None:
         pkgrel += PYTHON_VERSION_SUFFIX
 
     pkg.version = AlrinPackageVersion(
-        pkgver=pkgbuild_version.pkgver,
+        pkgver=pkg.version.pkgver,
         pkgrel=pkgrel,
-        epoch=pkgbuild_version.epoch,
+        epoch=pkg.version.epoch,
     )
-
-
-def postprocess_pkgbuild(pkg: AlrinPackageSource) -> None:
-    with pkg.get_abs_path().joinpath('PKGBUILD').open() as file:
-        pkg.version = extract_pkgbuild_version(file)

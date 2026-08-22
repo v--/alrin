@@ -4,8 +4,8 @@ import subprocess
 from collections.abc import Sequence
 from typing import no_type_check
 
-from alrin.buildinfo import AlrinBuiltPackage, get_existing_built
 from alrin.exceptions import AlrinPackageMetadataError
+from alrin.pkginfo import AlrinBuiltPackage, get_existing_built
 from alrin.state import AlrinSharedState
 from alrin.wrappers import repo_add, repo_remove
 

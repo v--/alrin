@@ -6,7 +6,7 @@ from click.testing import CliRunner
 from viat import ViatVault
 
 from alrin.cli import alrin_cli
-from alrin.workflow.pkgbuild import find_pkgbuild_value
+from alrin.workflow.pkgbuild import PYTHON_VERSION_SUFFIX
 from fixtures.manager import AlrinFixtureManager
 
 
@@ -109,12 +109,6 @@ def test_add_pypi_success(
     vault = ViatVault(temp_state_repo_path)
 
     with vault.storage as conn, conn.get_reader('pkgbuild/python-dummy') as reader:
+        assert reader['pkgver'] == '1'
+        assert reader['pkgrel'] == '1' + PYTHON_VERSION_SUFFIX
         assert reader['add_pkgrel_suffix'] is True
-
-    pkgrel = find_pkgbuild_value(
-        temp_state_repo_path.joinpath('pkgbuild', 'python-dummy', 'PKGBUILD').read_text(),
-        'pkgrel',
-    )
-
-    # The PYTHON_VERSION_SUFFIX has been cleared after the build
-    assert pkgrel == '1'

@@ -9,7 +9,7 @@ from alpm.alpm_srcinfo.source_info.v1.package_base import PackageBase
 from alrin.source import AlrinPackageSource
 
 
-def generate_buildinfo(**kwargs: str | Sequence[str] | None) -> Iterable[str]:
+def generate_pkginfo(**kwargs: str | Sequence[str] | None) -> Iterable[str]:
     for key, value in kwargs.items():
         if isinstance(value, str):
             yield f'{key} = {value}'
@@ -26,7 +26,7 @@ def write_package_file(
 ) -> None:
     buffer = io.BytesIO()
 
-    for chunk in generate_buildinfo(**contents):
+    for chunk in generate_pkginfo(**contents):
         buffer.write(chunk.encode('utf-8'))
         buffer.write(b'\n')
 
@@ -44,10 +44,11 @@ def mock_makepkg_subpackage(
     arch: str,
     builddate: int | None = None,
 ) -> None:
-    output_file = pkg.get_abs_path().joinpath(f'{subpackage.name if subpackage else base.name}-{pkg.version}-{arch}.pkg.tar.zst')
+    output_file = pkg.get_abs_path().joinpath(f'{subpackage.name if subpackage else base.name}-{pkg.version}-{arch}.pkg.tar')
 
     with tarfile.open(output_file, 'w') as file:
-        common_data = {
+        pkginfo_data = {
+            'xdata': 'pkgtype=split' if subpackage else 'pkgtype=pkg',
             'pkgbase': pkg.pkgname,
             'pkgname': str(subpackage.name if subpackage else base.name),
             'pkgdesc': str((subpackage.description if subpackage else None) or base.description),
@@ -59,19 +60,7 @@ def mock_makepkg_subpackage(
             'depend': [str(dep) for dep in ((subpackage.dependencies.value if (subpackage and subpackage.dependencies) else None) or base.licenses)],
         }
 
-        pkginfo_data = {
-            **common_data,
-            'xdata': 'pkgtype=split' if subpackage else 'pkgtype=pkg',
-        }
-
         write_package_file(file, '.PKGINFO', pkginfo_data)
-
-        buildinfo_data = {
-            **common_data,
-            'format': '2',
-        }
-
-        write_package_file(file, '.BUILDINFO', buildinfo_data)
 
 
 # ruff: ignore[missing-type-function-argument, unused-function-argument]

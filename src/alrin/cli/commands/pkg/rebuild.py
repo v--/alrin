@@ -8,9 +8,9 @@ from alrin.workflow import (
     alpmdb_add_packages,
     clean_worktree,
     makepkg_inside_jail,
-    postprocess_pkgbuild,
     preprocess_pkgbuild,
     process_built_files,
+    update_version_from_build_files,
 )
 
 from .group import pkg as pkg_cli
@@ -28,7 +28,7 @@ def rebuild(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
     clean_worktree(pkg)
     preprocess_pkgbuild(pkg)
     makepkg_inside_jail(pkg, builddate=pkg.viat_meta.builddate)
-    postprocess_pkgbuild(pkg)
+    update_version_from_build_files(pkg)
 
     if pkg.version > pkg.viat_meta.version:
         raise AlrinPackageMetadataError(f'Package {pkgname} has dynamically updated its version and needs to be properly updated')

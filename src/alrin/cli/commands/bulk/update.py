@@ -2,19 +2,19 @@ import logging
 
 import click
 
-from alrin.buildinfo import AlrinBuiltPackage
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import inject_subject, setup_logging
+from alrin.pkginfo import AlrinBuiltPackage
 from alrin.source import AlrinPackageSource
 from alrin.state import AlrinSharedState
 from alrin.workflow import (
     alpmdb_add_packages,
     clean_worktree,
     makepkg_inside_jail,
-    postprocess_pkgbuild,
     preprocess_pkgbuild,
     process_built_files,
     update_repo,
+    update_version_from_build_files,
 )
 
 from .group import bulk as bulk_cli
@@ -58,7 +58,7 @@ def update(shared: AlrinSharedState, verbose: bool) -> None:
     dest_files = list[AlrinBuiltPackage]()
 
     for pkg in updated:
-        postprocess_pkgbuild(pkg)
+        update_version_from_build_files(pkg)
         dest_files.extend(
             process_built_files(pkg),
         )

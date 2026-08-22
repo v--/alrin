@@ -3,8 +3,8 @@ import shutil
 
 import click
 
-from alrin.buildinfo import get_existing_built
 from alrin.logging import bind_logger_to_subject, setup_logging
+from alrin.pkginfo import get_existing_built
 from alrin.resolver import AlrinPathResolver
 from alrin.state import AlrinSharedState
 from alrin.workflow import alpmdb_remove_packages, remove_built_file, unregister_submodule

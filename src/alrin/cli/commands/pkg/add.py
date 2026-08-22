@@ -13,10 +13,10 @@ from alrin.workflow import (
     alpmdb_add_packages,
     clean_worktree,
     makepkg_inside_jail,
-    postprocess_pkgbuild,
     preprocess_pkgbuild,
     process_built_files,
     unregister_submodule,
+    update_version_from_build_files,
 )
 
 from .group import pkg as pkg_cli
@@ -77,7 +77,7 @@ def add(shared: AlrinSharedState, pkgname: str, url_template: str, verbose: bool
 
     preprocess_pkgbuild(pkg)
     makepkg_inside_jail(pkg)
-    postprocess_pkgbuild(pkg)
+    update_version_from_build_files(pkg)
 
     dest_files = process_built_files(pkg)
     clean_worktree(pkg)

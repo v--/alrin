@@ -1,30 +1,48 @@
 import pathlib
+import re
 import tarfile
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from typing import get_type_hints
 
 from alrin.exceptions import AlrinPackageMetadataError
+from alrin.metadata import AlrinPackageVersion
 from alrin.source import AlrinPackageSource
 from alrin.state import AlrinSharedState
 
 
+def parse_version(version_str: str) -> AlrinPackageVersion:
+    if match := re.match(r'((?P<epoch>\d+):)?(?P<pkgver>\d+)-(?P<pkgrel>\d+(.\d+)?)', version_str):
+        groups = match.groupdict()
+
+        return AlrinPackageVersion(
+            pkgver=groups['pkgver'],
+            pkgrel=groups['pkgrel'],
+            epoch=int(groups['epoch']) if groups.get('epoch') else None,
+        )
+
+    raise AlrinPackageMetadataError(f'Could not parse version {version_str!r}')
+
+
 @dataclass(frozen=True)
-class AlrinBuildInfo:
+class AlrinBuildPkgInfo:
     pkgbase: str
     pkgname: str
     pkgver: str
     pkgarch: str
     builddate: int
 
+    def parse_version(self) -> AlrinPackageVersion:
+        return parse_version(self.pkgver)
+
 
 class AlrinBuiltPackage:
     path: pathlib.Path
-    info: AlrinBuildInfo
+    info: AlrinBuildPkgInfo
 
     def __init__(self, path: pathlib.Path) -> None:
         self.path = path
-        self.info = extract_buildinfo(self.path)
+        self.info = extract_pkginfo(self.path)
 
     def get_signature_path(self) -> pathlib.Path:
         return self.path.with_name(self.path.name + '.sig')
@@ -36,21 +54,21 @@ class AlrinBuiltPackage:
             yield 'x86_64'
 
 
-def extract_buildinfo(pkg_path: pathlib.Path) -> AlrinBuildInfo:
+def extract_pkginfo(pkg_path: pathlib.Path) -> AlrinBuildPkgInfo:
     fields = dict[str, str]()
-    hints = get_type_hints(AlrinBuildInfo)
+    hints = get_type_hints(AlrinBuildPkgInfo)
 
     with tarfile.open(pkg_path) as file:
         try:
-            buildinfo = file.extractfile('.BUILDINFO')
+            pkginfo = file.extractfile('.PKGINFO')
         except KeyError as err:
-            raise AlrinPackageMetadataError(f'No .BUILDINFO file in {pkg_path}') from err
+            raise AlrinPackageMetadataError(f'No .PKGINFO file in {pkg_path}') from err
 
-        if buildinfo is None:
-            raise AlrinPackageMetadataError(f'.BUILDINFO of {pkg_path} is not a file')
+        if pkginfo is None:
+            raise AlrinPackageMetadataError(f'.PKGINFO of {pkg_path} is not a file')
 
-        while line := buildinfo.readline():
-            key, value = map(str.strip, line.decode(encoding='utf-8').split('=', maxsplit=2))
+        while line := pkginfo.readline():
+            key, value = line.decode(encoding='utf-8').split(' = ', maxsplit=2)
 
             if key in hints:
                 fields[key] = value
@@ -60,7 +78,7 @@ def extract_buildinfo(pkg_path: pathlib.Path) -> AlrinBuildInfo:
             raise AlrinPackageMetadataError(f'Could not read {key!r} from {pkg_path}')
 
     builddate = int(fields.pop('builddate'))
-    return AlrinBuildInfo(**fields, builddate=builddate)
+    return AlrinBuildPkgInfo(**fields, builddate=builddate)
 
 
 def get_newly_built(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
@@ -74,5 +92,6 @@ def get_newly_built(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
 def get_existing_built(shared: AlrinSharedState) -> Sequence[AlrinBuiltPackage]:
     return [
         AlrinBuiltPackage(pkg_path)
-        for pkg_path in shared.resolver.get_dest().rglob('*.pkg.tar.zst')
+        for pkg_path in shared.resolver.get_dest().rglob('*.pkg.*')
+        if pkg_path.suffix not in {'.sig', '.db'}
     ]
