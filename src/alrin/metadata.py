@@ -2,8 +2,8 @@ import functools
 from dataclasses import dataclass
 from typing import Self, cast
 
-lazy from alpm.type_aliases import SourceInfo
-lazy from viat.support.json import JsonObjectT
+from alpm.type_aliases import SourceInfo
+from viat.support.json import JsonObjectT
 
 
 @dataclass(frozen=True)

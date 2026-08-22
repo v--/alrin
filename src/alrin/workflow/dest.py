@@ -1,14 +1,14 @@
 import contextlib
 import hashlib
 import logging
-lazy from collections.abc import Sequence
+from collections.abc import Sequence
 
 import click
 
 from alrin.buildinfo import AlrinBuiltPackage, get_existing_built, get_newly_built
 from alrin.logging import bind_logger_to_subject
 from alrin.metadata import AlrinMetadata
-lazy from alrin.source import AlrinPackageSource
+from alrin.source import AlrinPackageSource
 
 from .gnupg import create_signature_file
 

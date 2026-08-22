@@ -1,5 +1,5 @@
 import logging
-lazy import pathlib
+import pathlib
 
 import gnupg
 

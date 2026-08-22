@@ -6,8 +6,8 @@ import pygit2
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import bind_logger_to_subject
-lazy from alrin.source import AlrinPackageSource
-lazy from alrin.state import AlrinSharedState
+from alrin.source import AlrinPackageSource
+from alrin.state import AlrinSharedState
 
 
 logger = logging.getLogger(__name__)

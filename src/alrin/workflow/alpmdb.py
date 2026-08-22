@@ -1,13 +1,13 @@
 import logging
 import pathlib
 import subprocess
+from collections.abc import Sequence
 from typing import no_type_check
-lazy from collections.abc import Sequence
 
 from alrin.buildinfo import AlrinBuiltPackage, get_existing_built
 from alrin.exceptions import AlrinPackageMetadataError
+from alrin.state import AlrinSharedState
 from alrin.wrappers import repo_add, repo_remove
-lazy from alrin.state import AlrinSharedState
 
 
 DEFAULT_REPOSITORY_NAME = 'ivasilev'
@@ -64,7 +64,9 @@ def alpmdb_remove_packages(
     })
 
     architectures = list({
-        *built.iter_arch() for built in existing_built if built.info.pkgbase in pkgnames
+        arch
+        for built in existing_built if built.info.pkgbase in pkgnames
+        for arch in built.iter_arch()
     })
 
     for arch in architectures:

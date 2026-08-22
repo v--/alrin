@@ -7,7 +7,7 @@ from typing import TextIO
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import inject_subject
 from alrin.metadata import AlrinPackageVersion
-lazy from alrin.source import AlrinPackageSource
+from alrin.source import AlrinPackageSource
 
 
 PYTHON_VERSION_SUFFIX = f'.{sys.version_info.major}{sys.version_info.minor}'

@@ -2,7 +2,7 @@ import contextlib
 import functools
 import logging
 import sys
-lazy from collections.abc import Callable, Generator
+from collections.abc import Callable, Generator
 
 import colorlog
 

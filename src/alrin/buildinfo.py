@@ -1,12 +1,12 @@
+import pathlib
 import tarfile
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from typing import get_type_hints
-lazy import pathlib
-lazy from collections.abc import Iterator, Sequence
 
 from alrin.exceptions import AlrinPackageMetadataError
-lazy from alrin.source import AlrinPackageSource
-lazy from alrin.state import AlrinSharedState
+from alrin.source import AlrinPackageSource
+from alrin.state import AlrinSharedState
 
 
 @dataclass(frozen=True)

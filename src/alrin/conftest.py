@@ -1,10 +1,8 @@
 import pathlib
 import shutil
 import tempfile
-from textwrap import dedent
-lazy from collections.abc import Generator
+from collections.abc import Generator
 
-import pygit2
 import pytest
 from click.testing import CliRunner
 

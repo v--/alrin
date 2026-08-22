@@ -1,7 +1,7 @@
+import pathlib
 from dataclasses import dataclass
-lazy import pathlib
 
-lazy from viat import ViatVault
+from viat import ViatVault
 
 
 @dataclass(frozen=True)

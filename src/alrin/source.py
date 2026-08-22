@@ -1,15 +1,14 @@
 import logging
-lazy import pathlib
+import pathlib
 
 import pygit2
 from alpm.alpm_srcinfo import SourceInfoError, source_info_from_file
-lazy from alpm.type_aliases import SourceInfo
+from alpm.type_aliases import SourceInfo
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import inject_subject
 from alrin.metadata import AlrinMetadata, AlrinPackageVersion
-from alrin.workflow.pkgbuild import extract_pkgbuild_version
-lazy from alrin.state import AlrinSharedState
+from alrin.state import AlrinSharedState
 
 
 logger = logging.getLogger(__name__)
@@ -49,6 +48,9 @@ class AlrinPackageSource:
                 logger.info('Could not read .SRCINFO. Using PKGBUILD instead.')
 
             with self.get_abs_path().joinpath('PKGBUILD').open() as file:
+                # ruff: ignore[import-outside-top-level]
+                from alrin.workflow.pkgbuild import extract_pkgbuild_version
+
                 self.version = extract_pkgbuild_version(file)
 
     def get_abs_path(self) -> pathlib.Path:

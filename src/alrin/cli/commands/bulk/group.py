@@ -1,7 +1,7 @@
 import click
 
 from alrin.cli.commands.group import alrin
-from alrin.state import initialize_shared_state
+from alrin.workflow import initialize_shared_state
 
 
 @alrin.group()

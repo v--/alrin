@@ -2,7 +2,7 @@
 import logging
 import pathlib
 import subprocess
-lazy from collections.abc import Sequence
+from collections.abc import Sequence
 
 
 logger = logging.getLogger(__name__)

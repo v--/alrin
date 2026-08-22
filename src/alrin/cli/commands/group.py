@@ -1,5 +1,5 @@
 import contextlib
-lazy from collections.abc import Generator
+from collections.abc import Generator
 
 import click
 from viat import ViatError

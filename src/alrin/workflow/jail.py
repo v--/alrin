@@ -3,8 +3,8 @@ import subprocess
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import inject_subject
+from alrin.source import AlrinPackageSource
 from alrin.wrappers import arch_nspawn, makechrootpkg, mkarchroot
-lazy from alrin.source import AlrinPackageSource
 
 
 logger = logging.getLogger(__name__)

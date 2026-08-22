@@ -5,7 +5,7 @@ description = "Arch Linux repository for ivasilev.net"
 license = "Unlicense"
 license-files = ["LICENSES/Unlicense.txt"]
 readme = "README.md"
-requires-python = ">=3.15"
+requires-python = ">=3.14"
 
 authors = [
   { name = "Ianis Vasilev", email = "ianis@ivasilev.net" }
@@ -55,7 +55,7 @@ preview = true
 ignore = [
   # undocumented-*
   "D1",
-  # We prefer lazy imports to `if TYPE_CHECKING` blocks.
+  # We prefer imports to `if TYPE_CHECKING` blocks.
   "typing-only-first-party-import",
   "typing-only-third-party-import",
   "typing-only-standard-library-import",
