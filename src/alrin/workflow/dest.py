@@ -42,8 +42,6 @@ def process_built_files(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
 
             if click.confirm(f'Remove {existing_rel}?', True):
                 remove_built_file(existing)
-            else:
-                ignored_files.add(new)
 
             continue
 

@@ -19,7 +19,12 @@ pipx install git+https://github.com/v--/alrin
 
 A new state repository can be initialized by running `alrin init` in an empty directory.
 
-You can optionally copy or symlink a `pacman.conf` file in `$ALRIN_STATE_REPO` and it will get synchronized before very build.
+You can optionally copy or symlink a `pacman.conf` file in `$ALRIN_STATE_REPO` and it will get synchronized before very build. To feed the built repository to `makechrootpkg`, append
+
+```ini
+[<repo name>]
+Server = file:///<state repository path>/pkgdest/$arch
+```
 
 The following can then register `<package>` from the AUR:
 
