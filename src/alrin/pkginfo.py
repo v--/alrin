@@ -71,7 +71,7 @@ def extract_pkginfo(pkg_path: pathlib.Path) -> AlrinBuildPkgInfo:
             key, value = line.decode(encoding='utf-8').split(' = ', maxsplit=2)
 
             if key in hints:
-                fields[key] = value
+                fields[key] = value.strip()
 
     for key in hints:
         if key not in fields:

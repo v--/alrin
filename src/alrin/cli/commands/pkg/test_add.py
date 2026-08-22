@@ -112,3 +112,29 @@ def test_add_pypi_success(
         assert reader['pkgver'] == '1'
         assert reader['pkgrel'] == '1' + PYTHON_VERSION_SUFFIX
         assert reader['add_pkgrel_suffix'] is True
+
+
+def test_add_subpackages_success(
+    temp_state_repo_path: pathlib.Path,
+    temp_sources_path: pathlib.Path,
+    fixture_manager: AlrinFixtureManager,
+    click_runner: CliRunner,
+) -> None:
+    fixture_manager.initialize_state_repo(temp_state_repo_path)
+    fixture_manager.source.initialize_at('dummy-subpackages', temp_sources_path)
+
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        fixture_manager.mock_jail_manager(monkeypatch)
+
+        result = click_runner.invoke(
+            alrin_cli,
+            ['pkg', 'add', 'dummy-subpackages', '--url-template', f'{temp_sources_path}/{{pkgname}}'],
+        )
+
+    assert 'Error' not in result.stderr
+
+    vault = ViatVault(temp_state_repo_path)
+
+    with vault.storage as conn, conn.get_reader('pkgbuild/dummy-subpackages') as reader:
+        assert reader['pkgver'] == '1'
+        assert reader['pkgrel'] == '1'

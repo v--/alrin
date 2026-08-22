@@ -9,7 +9,42 @@ from alpm.alpm_srcinfo.source_info.v1.package_base import PackageBase
 from alrin.source import AlrinPackageSource
 
 
-def generate_pkginfo(**kwargs: str | Sequence[str] | None) -> Iterable[str]:
+# ruff: ignore[missing-type-function-argument, unused-function-argument]
+def mock_makepkg(self, pkg: AlrinPackageSource, builddate: int | None = None) -> None:
+    srcinfo = pkg.read_srcinfo()
+
+    for package in srcinfo.packages:
+        for arch in package.architectures or srcinfo.base.architectures:
+            mock_makepkg_package(pkg, srcinfo.base, package, str(arch), builddate)
+
+
+def mock_makepkg_package(
+    pkg: AlrinPackageSource,
+    base: PackageBase,
+    package: Package,
+    arch: str,
+    builddate: int | None = None,
+) -> None:
+    output_file = pkg.get_abs_path().joinpath(f'{package.name if package else base.name}-{pkg.version}-{arch}.pkg.tar')
+
+    with tarfile.open(output_file, 'w') as file:
+        pkginfo_data = {
+            'xdata': 'pkgtype=split' if package else 'pkgtype=pkg',
+            'pkgbase': pkg.pkgname,
+            'pkgname': str(package.name or base.name),
+            'pkgdesc': str(package.description or base.description),
+            # ruff: ignore[builtin-variable-shadowing]
+            'license': [str(license) for license in ((package.licenses.value if package.licenses else None) or base.licenses)],
+            'pkgver': str(pkg.version),
+            'builddate': str(time.time_ns() // 1_000_000) if builddate is None else str(builddate),
+            'pkgarch': str(arch),
+            'depend': [str(dep) for dep in ((package.dependencies.value if package.dependencies else None) or base.dependencies)],
+        }
+
+        write_package_file(file, '.PKGINFO', pkginfo_data)
+
+
+def generate_pkginfo_lines(**kwargs: str | Sequence[str] | None) -> Iterable[str]:
     for key, value in kwargs.items():
         if isinstance(value, str):
             yield f'{key} = {value}'
@@ -26,7 +61,7 @@ def write_package_file(
 ) -> None:
     buffer = io.BytesIO()
 
-    for chunk in generate_pkginfo(**contents):
+    for chunk in generate_pkginfo_lines(**contents):
         buffer.write(chunk.encode('utf-8'))
         buffer.write(b'\n')
 
@@ -35,41 +70,3 @@ def write_package_file(
     buffer.seek(0)
 
     tar_file.addfile(info, buffer)
-
-
-def mock_makepkg_subpackage(
-    pkg: AlrinPackageSource,
-    base: PackageBase,
-    subpackage: Package | None,
-    arch: str,
-    builddate: int | None = None,
-) -> None:
-    output_file = pkg.get_abs_path().joinpath(f'{subpackage.name if subpackage else base.name}-{pkg.version}-{arch}.pkg.tar')
-
-    with tarfile.open(output_file, 'w') as file:
-        pkginfo_data = {
-            'xdata': 'pkgtype=split' if subpackage else 'pkgtype=pkg',
-            'pkgbase': pkg.pkgname,
-            'pkgname': str(subpackage.name if subpackage else base.name),
-            'pkgdesc': str((subpackage.description if subpackage else None) or base.description),
-            # ruff: ignore[builtin-variable-shadowing]
-            'license': [str(license) for license in ((subpackage.licenses.value if (subpackage and subpackage.licenses) else None) or base.licenses)],
-            'pkgver': str(pkg.version),
-            'builddate': str(time.time_ns() // 1_000_000) if builddate is None else str(builddate),
-            'pkgarch': str(arch),
-            'depend': [str(dep) for dep in ((subpackage.dependencies.value if (subpackage and subpackage.dependencies) else None) or base.licenses)],
-        }
-
-        write_package_file(file, '.PKGINFO', pkginfo_data)
-
-
-# ruff: ignore[missing-type-function-argument, unused-function-argument]
-def mock_makepkg(self, pkg: AlrinPackageSource, builddate: int | None = None) -> None:
-    srcinfo = pkg.read_srcinfo()
-
-    for arch in srcinfo.base.architectures:
-        mock_makepkg_subpackage(pkg, srcinfo.base, subpackage=None, arch=str(arch), builddate=builddate)
-
-    for subpackage in srcinfo.packages:
-        for arch in subpackage.architectures or srcinfo.base.architectures:
-            mock_makepkg_subpackage(pkg, srcinfo.base, subpackage=subpackage, arch=str(arch), builddate=builddate)

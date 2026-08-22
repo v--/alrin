@@ -1,0 +1,15 @@
+pkgbase=subpackages
+pkgname=('a' 'b')
+pkgver=1
+pkgrel=1
+pkgdesc="Dummy ALPM repository"
+arch=('any')
+license=('MIT')
+
+package_a() {
+    echo "Packaging a"
+}
+
+package_b() {
+    echo "Packaging b"
+}
