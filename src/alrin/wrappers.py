@@ -112,8 +112,6 @@ def repo_add(
     quiet: bool = False,
     sign: bool = False,
     cwd: pathlib.Path | None = None,
-    # ruff: ignore[invalid-argument-name]
-    GNUPGHOME: pathlib.Path | None = None,
 ) -> None:
     option_args = list[str]()
 
@@ -122,11 +120,6 @@ def repo_add(
 
     if sign:
         option_args.append('--sign')
-
-    env = dict[str, str]()
-
-    if GNUPGHOME is not None:
-        env['GNUPGHOME'] = GNUPGHOME.as_posix()
 
     subprocess.run(
         [
@@ -145,8 +138,6 @@ def repo_remove(
     quiet: bool = False,
     sign: bool = False,
     cwd: pathlib.Path | None = None,
-    # ruff: ignore[invalid-argument-name]
-    GNUPGHOME: pathlib.Path | None = None,
 ) -> None:
     option_args = list[str]()
 
@@ -156,11 +147,6 @@ def repo_remove(
     if sign:
         option_args.append('--sign')
 
-    env = dict[str, str]()
-
-    if GNUPGHOME is not None:
-        env['GNUPGHOME'] = GNUPGHOME.as_posix()
-
     subprocess.run(
         [
             'repo-remove', *option_args, path_to_db.as_posix(),
@@ -168,7 +154,6 @@ def repo_remove(
         ],
         check=True,
         cwd=cwd,
-        env=env,
     )
 
 
