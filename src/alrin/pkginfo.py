@@ -14,7 +14,7 @@ class AlrinBuildPkgInfo:
     pkgbase: str
     pkgname: str
     pkgver: str
-    pkgarch: str
+    arch: str
     builddate: int
 
 
@@ -30,9 +30,9 @@ class AlrinBuiltPackage:
         return self.path.with_name(self.path.name + '.sig')
 
     def iter_arch(self) -> Iterator[str]:
-        yield self.info.pkgarch
+        yield self.info.arch
 
-        if self.info.pkgarch == 'any':
+        if self.info.arch == 'any':
             yield 'x86_64'
 
 
@@ -41,7 +41,7 @@ class PackageArchPair(NamedTuple):
     arch: str
 
     def is_copy(self) -> bool:
-        return self.built.info.pkgarch != self.arch
+        return self.built.info.arch != self.arch
 
 
 class PackageNameArchPair(NamedTuple):

@@ -82,7 +82,7 @@ class BuiltFileProcessor:
         for existing, dest_arch in self.existing_built:
             if existing.info.pkgbase != self.pkg.pkgname:
                 continue
-            elif existing.info.pkgarch != dest_arch:
+            elif existing.info.arch != dest_arch:
                 logger.debug(f'Removing existing copy {existing.path.name} for {dest_arch}. We will create a copy of the newly built file.')
                 remove_built_file(existing)
                 self.obsolete_architectures.add(PackageNameArchPair(existing.info.pkgname, dest_arch))

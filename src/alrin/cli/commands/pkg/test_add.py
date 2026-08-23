@@ -45,7 +45,7 @@ def test_add_success(
 
     assert len(original_built) == 2
     assert original_built[0].built.info.pkgname == 'dummy'
-    assert original_built[0].built.info.pkgarch == 'any'
+    assert original_built[0].built.info.arch == 'any'
 
     db_packages = read_database(
         temp_vault_path.joinpath('pkgdest', 'any', 'alrin.db.tar'),

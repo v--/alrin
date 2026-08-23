@@ -45,7 +45,7 @@ def mock_makepkg_package(
             'license': [str(license) for license in ((package.licenses.value if package.licenses else None) or base.licenses)],
             'pkgver': str(pkg.version),
             'builddate': str(time.time_ns() // 1_000_000) if builddate is None else str(builddate),
-            'pkgarch': str(arch),
+            'arch': str(arch),
             'depend': [str(dep) for dep in ((package.dependencies.value if package.dependencies else None) or base.dependencies)],
         }
 
