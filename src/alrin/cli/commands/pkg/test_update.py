@@ -30,7 +30,7 @@ def test_update_success(
 
         click_runner.invoke(
             alrin_cli,
-            ['pkg', 'add', 'dummy', '--url-template', f'{temp_sources_path}/{{pkgname}}'],
+            ['pkg', 'add', 'dummy', '--url-template', f'{temp_sources_path}/{{pkgbase}}'],
         )
 
     # Save the files originally built

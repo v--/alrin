@@ -27,7 +27,7 @@ def test_add_success(
 
         result = click_runner.invoke(
             alrin_cli,
-            ['pkg', 'add', 'dummy', '--url-template', f'{temp_sources_path}/{{pkgname}}'],
+            ['pkg', 'add', 'dummy', '--url-template', f'{temp_sources_path}/{{pkgbase}}'],
         )
 
     assert 'Error' not in result.stderr
@@ -70,7 +70,7 @@ def test_add_invalid_path(
 
         result = click_runner.invoke(
             alrin_cli,
-            ['pkg', 'add', 'empty', '--url-template', f'{temp_sources_path}/{{pkgname}}'],
+            ['pkg', 'add', 'empty', '--url-template', f'{temp_sources_path}/{{pkgbase}}'],
         )
 
     assert 'Removing invalid repository' in result.stderr
@@ -93,7 +93,7 @@ def test_add_bad_pkgbuild(
 
         result = click_runner.invoke(
             alrin_cli,
-            ['pkg', 'add', 'bad-pkgbuild', '--url-template', f'{temp_sources_path}/{{pkgname}}'],
+            ['pkg', 'add', 'bad-pkgbuild', '--url-template', f'{temp_sources_path}/{{pkgbase}}'],
             env={'ALRIN_VAULT': temp_vault_path.as_posix()},
         )
 
@@ -119,7 +119,7 @@ def test_add_pypi_success(
 
         result = click_runner.invoke(
             alrin_cli,
-            ['pkg', 'add', 'python-dummy', '--url-template', f'{temp_sources_path}/{{pkgname}}'],
+            ['pkg', 'add', 'python-dummy', '--url-template', f'{temp_sources_path}/{{pkgbase}}'],
             input=b'yes\n',
         )
 
@@ -155,7 +155,7 @@ def test_add_subpackages_success(
 
         result = click_runner.invoke(
             alrin_cli,
-            ['pkg', 'add', 'dummy-subpackages', '--url-template', f'{temp_sources_path}/{{pkgname}}'],
+            ['pkg', 'add', 'dummy-subpackages', '--url-template', f'{temp_sources_path}/{{pkgbase}}'],
         )
 
     assert 'Error' not in result.stderr

@@ -28,7 +28,7 @@ def test_rebuild_full_match(
 
         click_runner.invoke(
             alrin_cli,
-            ['pkg', 'add', 'dummy', '--url-template', f'{temp_sources_path}/{{pkgname}}'],
+            ['pkg', 'add', 'dummy', '--url-template', f'{temp_sources_path}/{{pkgbase}}'],
         )
 
     # Run a rebuild
@@ -59,7 +59,7 @@ def test_rebuild_incomplete_match(
 
         click_runner.invoke(
             alrin_cli,
-            ['pkg', 'add', 'dummy', '--url-template', f'{temp_sources_path}/{{pkgname}}'],
+            ['pkg', 'add', 'dummy', '--url-template', f'{temp_sources_path}/{{pkgbase}}'],
         )
 
     # Modify cloned package

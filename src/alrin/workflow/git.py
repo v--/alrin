@@ -13,7 +13,7 @@ from alrin.state import AlrinSharedState
 logger = logging.getLogger(__name__)
 
 
-@bind_logger_to_subject(logger, lambda pkg: pkg.pkgname)
+@bind_logger_to_subject(logger, lambda pkg: pkg.pkgbase)
 def clean_worktree(pkg: AlrinPackageSource) -> None:
     if pkg.repo is None:
         raise AlrinPackageMetadataError('No git repository specified')
@@ -40,7 +40,7 @@ def remove_config_section(path: pathlib.Path, section_name: str) -> None:
                 new_config[entry.name] = entry.value
 
 
-@bind_logger_to_subject(logger, lambda pkg: pkg.pkgname)
+@bind_logger_to_subject(logger, lambda pkg: pkg.pkgbase)
 def update_repo(pkg: AlrinPackageSource) -> None:
     if pkg.repo is None:
         raise AlrinPackageMetadataError('No git repository specified')
@@ -65,12 +65,12 @@ def update_repo(pkg: AlrinPackageSource) -> None:
     pkg.reread_version()
 
 
-@bind_logger_to_subject(logger, lambda _, pkgname: pkgname)
-def unregister_submodule(shared: AlrinSharedState, pkgname: str) -> None:
+@bind_logger_to_subject(logger, lambda _, pkgbase: pkgbase)
+def unregister_submodule(shared: AlrinSharedState, pkgbase: str) -> None:
     # Removing a git module is tricky. We remove the directory itself only after unregistering it.
     # See https://stackoverflow.com/a/35743109/2756776
     root_path = shared.resolver.get_root()
-    pkg_path = shared.resolver.get_pkg(pkgname)
+    pkg_path = shared.resolver.get_pkg(pkgbase)
     raw_path = pkg_path.relative_to(root_path).as_posix()
 
     repo = pygit2.Repository(root_path)

@@ -16,7 +16,7 @@ def preprocess_pkgbuild(pkg: AlrinPackageSource) -> None:
     pkgrel = pkg.version.pkgrel
 
     if pkg.viat_meta.add_pkgrel_suffix and not pkgrel.endswith(PYTHON_VERSION_SUFFIX):
-        with inject_subject(logger, pkg.pkgname):
+        with inject_subject(logger, pkg.pkgbase):
             logger.info(f'Adding a pkgrel suffix {PYTHON_VERSION_SUFFIX}.')
 
         pkgbuild_path.write_text(

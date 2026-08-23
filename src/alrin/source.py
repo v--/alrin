@@ -44,19 +44,19 @@ def read_srcinfo_with_retry(shared: AlrinSharedState, pkgname: str) -> SourceInf
 
 class AlrinPackageSource:
     shared: AlrinSharedState
-    pkgname: str
+    pkgbase: str
 
     repo: pygit2.Repository
     version: AlrinPackageVersion
     viat_meta: AlrinPkgbuildMetadata
 
-    def __init__(self, shared: AlrinSharedState, pkgname: str) -> None:
+    def __init__(self, shared: AlrinSharedState, pkgbase: str) -> None:
         self.shared = shared
-        self.pkgname = pkgname
+        self.pkgbase = pkgbase
         pkg_path = self.get_abs_path()
 
         if not shared.vault.tracker.is_tracked(pkg_path):
-            raise AlrinPackageMetadataError(f'Unrecognized package name {pkgname}')
+            raise AlrinPackageMetadataError(f'Unrecognized package name {pkgbase}')
 
         with shared.vault.storage as conn, conn.get_reader(pkg_path) as reader:
             self.viat_meta = AlrinPkgbuildMetadata.from_json(reader)
@@ -72,13 +72,13 @@ class AlrinPackageSource:
         self.reread_version()
 
     def get_abs_path(self) -> pathlib.Path:
-        return self.shared.resolver.get_pkg(self.pkgname)
+        return self.shared.resolver.get_pkg(self.pkgbase)
 
     def get_rel_path(self) -> pathlib.Path:
         return self.shared.vault.resolver.relativize(self.get_abs_path())
 
     def read_srcinfo(self) -> SourceInfo:
-        return read_srcinfo_with_retry(self.shared, self.pkgname)
+        return read_srcinfo_with_retry(self.shared, self.pkgbase)
 
     def reread_version(self) -> None:
         self.version = AlrinPackageVersion.from_srcinfo(self.read_srcinfo())

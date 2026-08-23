@@ -51,7 +51,7 @@ class AlrinJailManager:
             raise AlrinPackageMetadataError('Jail update failed') from err
 
     def makepkg(self, pkg: AlrinPackageSource, builddate: int | None = None) -> None:
-        with inject_subject(logger, pkg.pkgname):
+        with inject_subject(logger, pkg.pkgbase):
             logger.info('Building inside jail.')
 
         try:

@@ -26,7 +26,7 @@ def remove_built_file(built: AlrinBuiltPackage) -> None:
         built.get_signature_path().unlink()
 
 
-@bind_logger_to_subject(logger, lambda pkg: pkg.pkgname)
+@bind_logger_to_subject(logger, lambda pkg: pkg.pkgbase)
 def update_version_from_build_files(pkg: AlrinPackageSource) -> None:
     versions = {built.info.pkgver for built in get_newly_built(pkg)}
 
@@ -85,7 +85,7 @@ class BuiltFileProcessor:
         for existing_pair in self.existing_built:
             existing, dest_arch = existing_pair
 
-            if existing.info.pkgbase != pkg.pkgname:
+            if existing.info.pkgbase != pkg.pkgbase:
                 continue
             elif existing.info.arch != dest_arch:
                 self.obsolete_architectures.append(existing_pair)
@@ -171,7 +171,7 @@ def process_built_files(*pkgs: AlrinPackageSource) -> None:
     processor = BuiltFileProcessor()
 
     for pkg in pkgs:
-        with inject_subject(logger, pkg.pkgname):
+        with inject_subject(logger, pkg.pkgbase):
             processor.process_pkg(pkg)
 
     processor.clean_obsolete_files()

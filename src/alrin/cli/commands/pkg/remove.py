@@ -16,18 +16,18 @@ logger = logging.getLogger(__name__)
 
 
 @pkg_cli.command()
-@click.argument('pkgname')
+@click.argument('pkgbase')
 @click.option('-v', '--verbose', is_flag=True)
 @click.pass_obj
 # ruff: ignore[unused-lambda-argument]
-@bind_logger_to_subject(logger, lambda shared, pkgname, verbose: pkgname)
-def remove(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
+@bind_logger_to_subject(logger, lambda shared, pkgbase, verbose: pkgbase)
+def remove(shared: AlrinSharedState, pkgbase: str, verbose: bool) -> None:
     setup_logging(shared.verbose_logging or verbose)
 
     resolver = AlrinPathResolver(shared.vault)
-    pkg_path = resolver.get_pkg(pkgname)
+    pkg_path = resolver.get_pkg(pkgbase)
 
-    unregister_submodule(shared, pkgname)
+    unregister_submodule(shared, pkgbase)
 
     if pkg_path.exists():
         rel_path = resolver.relativize(pkg_path)
@@ -39,7 +39,7 @@ def remove(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
             logger.info('Clearing Viat metadata.')
             mut.clear()
 
-    existing_built = [pair for pair in get_existing_built(shared.resolver) if pair.built.info.pkgbase == pkgname]
+    existing_built = [pair for pair in get_existing_built(shared.resolver) if pair.built.info.pkgbase == pkgbase]
 
     if len(existing_built) > 0:
         logger.info('Updating ALPM database.')

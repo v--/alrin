@@ -21,15 +21,15 @@ logger = logging.getLogger(__name__)
 
 
 @pkg_cli.command()
-@click.argument('pkgname')
+@click.argument('pkgbase')
 @click.option('-v', '--verbose', is_flag=True)
 @click.pass_obj
 # ruff: ignore[unused-lambda-argument]
-@bind_logger_to_subject(logger, lambda shared, pkgname, verbose: pkgname)
-def update(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
+@bind_logger_to_subject(logger, lambda shared, pkgbase, verbose: pkgbase)
+def update(shared: AlrinSharedState, pkgbase: str, verbose: bool) -> None:
     setup_logging(shared.verbose_logging or verbose)
 
-    pkg = AlrinPackageSource(shared, pkgname)
+    pkg = AlrinPackageSource(shared, pkgbase)
     update_repo(pkg)
     preprocess_pkgbuild(pkg)
 

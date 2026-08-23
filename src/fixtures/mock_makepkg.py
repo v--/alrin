@@ -38,7 +38,7 @@ def mock_makepkg_package(
     with tarfile.open(output_file, 'w') as file:
         pkginfo_data = {
             'xdata': 'pkgtype=split' if is_split else 'pkgtype=pkg',
-            'pkgbase': pkg.pkgname,
+            'pkgbase': pkg.pkgbase,
             'pkgname': str(package.name or base.name),
             'pkgdesc': str(package.description or base.description),
             # ruff: ignore[builtin-variable-shadowing]

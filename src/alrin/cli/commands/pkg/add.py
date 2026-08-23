@@ -25,18 +25,18 @@ logger = logging.getLogger(__name__)
 
 
 @pkg_cli.command()
-@click.argument('pkgname')
+@click.argument('pkgbase')
 @click.option('-v', '--verbose', is_flag=True)
-@click.option('--url-template', type=str, default='https://aur.archlinux.org/{pkgname}.git')
+@click.option('--url-template', type=str, default='https://aur.archlinux.org/{pkgbase}.git')
 @click.pass_obj
 # ruff: ignore[unused-lambda-argument]
-@bind_logger_to_subject(logger, lambda shared, pkgname, url_template, verbose: pkgname)
-def add(shared: AlrinSharedState, pkgname: str, url_template: str, verbose: bool) -> None:
+@bind_logger_to_subject(logger, lambda shared, pkgbase, url_template, verbose: pkgbase)
+def add(shared: AlrinSharedState, pkgbase: str, url_template: str, verbose: bool) -> None:
     setup_logging(shared.verbose_logging or verbose)
 
-    url = url_template.format(pkgname=pkgname)
+    url = url_template.format(pkgbase=pkgbase)
     resolver = AlrinPathResolver(shared.vault)
-    pkg_path = resolver.get_pkg(pkgname)
+    pkg_path = resolver.get_pkg(pkgbase)
     rel_path = resolver.relativize(pkg_path)
 
     if pkg_path.exists():
@@ -51,16 +51,16 @@ def add(shared: AlrinSharedState, pkgname: str, url_template: str, verbose: bool
         logger.exception('Git error')
         logger.info(f'Removing invalid repository from {rel_path}.')
         shutil.rmtree(rel_path, ignore_errors=True)
-        unregister_submodule(shared, pkgname)
+        unregister_submodule(shared, pkgbase)
         raise AlrinPackageMetadataError(f'Invalid git repository at {url!r}') from err
 
     try:
-        srcinfo = read_srcinfo_with_retry(shared, pkgname)
+        srcinfo = read_srcinfo_with_retry(shared, pkgbase)
     except AlrinPackageMetadataError:
         logger.exception('Error reading .SRCINFO')
         logger.info(f'Removing invalid repository from {rel_path}.')
         shutil.rmtree(rel_path, ignore_errors=True)
-        unregister_submodule(shared, pkgname)
+        unregister_submodule(shared, pkgbase)
         raise
 
     logger.info('Adding mock Viat metadata.')
@@ -72,7 +72,7 @@ def add(shared: AlrinSharedState, pkgname: str, url_template: str, verbose: bool
             mut['add_pkgrel_suffix'] = True
 
     logger.info('Building.')
-    pkg = AlrinPackageSource(shared, pkgname)
+    pkg = AlrinPackageSource(shared, pkgbase)
 
     preprocess_pkgbuild(pkg)
     makepkg_inside_jail(pkg)
