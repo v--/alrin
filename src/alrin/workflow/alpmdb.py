@@ -49,7 +49,7 @@ def alpmdb_remove_packages(shared: AlrinSharedState, arch: str, pkgnames: Sequen
     path_to_db = pathlib.Path(arch) / shared.meta.database.get_db_file_name()
 
     pkg_len = len(pkgnames)
-    logger.info(f'Adding {pkg_len} {'package' if pkg_len == 1 else 'packages'} to {path_to_db}.')
+    logger.info(f'Removing {pkg_len} {'package' if pkg_len == 1 else 'packages'} from {path_to_db}.')
 
     try:
         repo_remove(
