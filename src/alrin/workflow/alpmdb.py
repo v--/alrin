@@ -4,7 +4,7 @@ import subprocess
 from collections.abc import Sequence
 
 from alrin.exceptions import AlrinPackageMetadataError
-from alrin.pkginfo import AlrinBuiltPackage, PackageNameArchPair
+from alrin.pkginfo import AlrinBuiltPackage, PackageArchPair
 from alrin.state import AlrinSharedState
 from alrin.wrappers import repo_add, repo_remove
 
@@ -63,10 +63,10 @@ def alpmdb_remove_packages(shared: AlrinSharedState, arch: str, pkgnames: Sequen
         raise AlrinPackageMetadataError('Repository update failed') from err
 
 
-def alpmdb_bulk_remove_packages(shared: AlrinSharedState, pairs: Sequence[PackageNameArchPair]) -> None:
-    for arch in {arch for pkgname, arch in pairs}:
+def alpmdb_bulk_remove_packages(shared: AlrinSharedState, pairs: Sequence[PackageArchPair]) -> None:
+    for arch in {arch for built, arch in pairs}:
         alpmdb_remove_packages(
             shared,
             arch,
-            [pkgname for pkgname, a in pairs if a == arch],
+            list({built.info.pkgname for built, a in pairs if a == arch}),
         )

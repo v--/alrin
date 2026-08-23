@@ -13,7 +13,7 @@ from alrin.workflow import (
     clean_worktree,
     makepkg_inside_jail,
     preprocess_pkgbuild,
-    process_built_files_and_update_db,
+    process_built_files,
     unregister_submodule,
     update_version_from_build_files,
 )
@@ -77,5 +77,5 @@ def add(shared: AlrinSharedState, pkgname: str, url_template: str, verbose: bool
     preprocess_pkgbuild(pkg)
     makepkg_inside_jail(pkg)
     update_version_from_build_files(pkg)
-    process_built_files_and_update_db(pkg)
+    process_built_files(pkg)
     clean_worktree(pkg)

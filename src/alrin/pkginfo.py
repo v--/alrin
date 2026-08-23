@@ -44,11 +44,6 @@ class PackageArchPair(NamedTuple):
         return self.built.info.arch != self.arch
 
 
-class PackageNameArchPair(NamedTuple):
-    pkgname: str
-    arch: str
-
-
 def extract_pkginfo(pkg_path: pathlib.Path) -> AlrinBuildPkgInfo:
     fields = dict[str, str]()
     hints = get_type_hints(AlrinBuildPkgInfo)

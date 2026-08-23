@@ -8,7 +8,6 @@ from alrin.pkginfo import get_existing_built
 from alrin.resolver import AlrinPathResolver
 from alrin.state import AlrinSharedState
 from alrin.workflow import alpmdb_bulk_remove_packages, remove_built_file, unregister_submodule
-from alrin.workflow.dest import PackageNameArchPair
 
 from .group import pkg as pkg_cli
 
@@ -44,7 +43,7 @@ def remove(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
 
     if len(existing_built) > 0:
         logger.info('Updating ALPM database.')
-        alpmdb_bulk_remove_packages(shared, [PackageNameArchPair(built.info.pkgname, arch) for built, arch in existing_built])
+        alpmdb_bulk_remove_packages(shared, existing_built)
 
     for existing, arch in existing_built:
         logger.info(f'Removing {arch}/{existing.path.name}.')
