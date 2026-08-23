@@ -21,7 +21,7 @@ def clean_worktree(pkg: AlrinPackageSource) -> None:
     logger.info('Clearing working tree.')
 
     pkg.repo.checkout_head(
-        strategy=pygit2.GIT_CHECKOUT_FORCE | pygit2.GIT_CHECKOUT_REMOVE_UNTRACKED | pygit2.GIT_CHECKOUT_REMOVE_UNTRACKED,
+        strategy=pygit2.GIT_CHECKOUT_FORCE | pygit2.GIT_CHECKOUT_REMOVE_UNTRACKED | pygit2.GIT_CHECKOUT_REMOVE_IGNORED,
     )
 
 

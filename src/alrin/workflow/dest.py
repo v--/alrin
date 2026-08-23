@@ -34,7 +34,7 @@ def update_version_from_build_files(pkg: AlrinPackageSource) -> None:
         raise AlrinPackageMetadataError('No files build to extract the version from')
 
     if len(versions) > 1:
-        raise AlrinPackageMetadataError(f'Multiple versions of the same package {pkg}')
+        raise AlrinPackageMetadataError(f'Multiple versions of the same package with base {pkg.pkgbase}')
 
     raw_version = next(iter(versions))
     pkg.version = AlrinPackageVersion.from_string(raw_version)
