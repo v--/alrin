@@ -100,7 +100,7 @@ class AlrinPackageVersion:
 
     @classmethod
     def from_string(cls, string: str) -> Self:
-        if match := re.match(r'((?P<epoch>\d+):)?(?P<pkgver>\d+)-(?P<pkgrel>\d+(.\d+)?)', string):
+        if match := re.match(r'((?P<epoch>\d+):)?(?P<pkgver>[^-]+)-(?P<pkgrel>\d+(.\d+)?)', string):
             groups = match.groupdict()
 
             return cls(

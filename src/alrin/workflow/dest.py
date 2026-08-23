@@ -58,8 +58,6 @@ class BuiltFileProcessor:
 
     def disseminate_file(self, built: AlrinBuiltPackage) -> None:
         for arch in built.iter_arch():
-            logger.info(f'Copying {built.path.name} for architecture {arch}.')
-
             arch_path = self.pkg.shared.resolver.get_dest() / arch
             arch_path.mkdir(parents=True, exist_ok=True)
             dest_file_path = arch_path / built.path.name
@@ -69,6 +67,19 @@ class BuiltFileProcessor:
                 continue
 
             self.obsolete_architectures.discard(PackageNameArchPair(built.info.pkgname, arch))
+
+            if dest_file_path.exists():
+                old_hash = hashlib.md5(dest_file_path.read_bytes()).hexdigest()
+                new_hash = hashlib.md5(built.path.read_bytes()).hexdigest()
+
+                if old_hash == new_hash:
+                    logger.debug(f'File {built.path.name} is already copied for architecture {arch}.')
+                    continue
+                else:
+                    logger.info(f'Overwriting obsolete file {built.path.name} for architecture {arch}.')
+            else:
+                logger.info(f'Copying {built.path.name} for architecture {arch}.')
+
             built.path.copy(arch_path / built.path.name)
 
             with contextlib.suppress(FileNotFoundError):
@@ -83,8 +94,6 @@ class BuiltFileProcessor:
             if existing.info.pkgbase != self.pkg.pkgname:
                 continue
             elif existing.info.arch != dest_arch:
-                logger.debug(f'Removing existing copy {existing.path.name} for {dest_arch}. We will create a copy of the newly built file.')
-                remove_built_file(existing)
                 self.obsolete_architectures.add(PackageNameArchPair(existing.info.pkgname, dest_arch))
                 continue
 
@@ -150,9 +159,16 @@ class BuiltFileProcessor:
             mut['builddate'] = builddate
             self.pkg.viat_meta = AlrinPkgbuildMetadata.from_json(mut)
 
+    def clean_obsolete_files(self) -> None:
+        for pkgname, arch in self.obsolete_architectures:
+            built = next(built for built, a in self.existing_built if built.info.pkgname == pkgname and a == arch)
+            logger.debug(f'Removing obsolete copy {built.path.name} for {arch}.')
+            remove_built_file(built)
+
     def process_all(self) -> None:
         self.process_existing_built()
         self.process_newly_built()
+        self.clean_obsolete_files()
 
 
 @bind_logger_to_subject(logger, lambda pkg: pkg.pkgname)
