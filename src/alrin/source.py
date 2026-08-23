@@ -8,7 +8,7 @@ from alpm.type_aliases import SourceInfo
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import bind_logger_to_subject
-from alrin.metadata import AlrinPkgbuildMetadata, AlrinPackageVersion
+from alrin.metadata import AlrinPackageVersion, AlrinPkgbuildMetadata
 from alrin.state import AlrinSharedState
 from alrin.wrappers import alpm_srcinfo_create
 
@@ -69,7 +69,7 @@ class AlrinPackageSource:
             git_rel_path = shared.resolver.relativize(git_path)
             raise AlrinPackageMetadataError(f'Path {git_rel_path} is not a valid git repository') from err
 
-        self.version = AlrinPackageVersion.from_srcinfo(self.read_srcinfo())
+        self.reread_version()
 
     def get_abs_path(self) -> pathlib.Path:
         return self.shared.resolver.get_pkg(self.pkgname)
@@ -79,3 +79,6 @@ class AlrinPackageSource:
 
     def read_srcinfo(self) -> SourceInfo:
         return read_srcinfo_with_retry(self.shared, self.pkgname)
+
+    def reread_version(self) -> None:
+        self.version = AlrinPackageVersion.from_srcinfo(self.read_srcinfo())

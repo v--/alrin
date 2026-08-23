@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from typing import get_type_hints
 
 from alrin.exceptions import AlrinPackageMetadataError
+from alrin.resolver import AlrinPathResolver
 from alrin.source import AlrinPackageSource
-from alrin.state import AlrinSharedState
 
 
 @dataclass(frozen=True)
@@ -25,6 +25,9 @@ class AlrinBuiltPackage:
     def __init__(self, path: pathlib.Path) -> None:
         self.path = path
         self.info = extract_pkginfo(self.path)
+
+    def is_copy(self) -> bool:
+        return self.info.pkgarch != self.path.parent.name
 
     def get_signature_path(self) -> pathlib.Path:
         return self.path.with_name(self.path.name + '.sig')
@@ -50,10 +53,13 @@ def extract_pkginfo(pkg_path: pathlib.Path) -> AlrinBuildPkgInfo:
             raise AlrinPackageMetadataError(f'.PKGINFO of {pkg_path} is not a file')
 
         while line := pkginfo.readline():
-            key, value = line.decode(encoding='utf-8').split(' = ', maxsplit=2)
+            try:
+                key, value = map(str.strip, line.decode(encoding='utf-8').split('=', maxsplit=1))
+            except ValueError:
+                continue
 
             if key in hints:
-                fields[key] = value.strip()
+                fields[key] = value
 
     for key in hints:
         if key not in fields:
@@ -71,9 +77,9 @@ def get_newly_built(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
     ]
 
 
-def get_existing_built(shared: AlrinSharedState) -> Sequence[AlrinBuiltPackage]:
+def get_existing_built(resolver: AlrinPathResolver) -> Sequence[AlrinBuiltPackage]:
     return [
         AlrinBuiltPackage(pkg_path)
-        for pkg_path in shared.resolver.get_dest().rglob('*.pkg.*')
+        for pkg_path in resolver.get_dest().rglob('*.pkg.*')
         if pkg_path.suffix not in {'.sig', '.db'}
     ]

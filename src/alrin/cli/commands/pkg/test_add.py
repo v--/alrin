@@ -6,6 +6,8 @@ from click.testing import CliRunner
 from viat import ViatVault
 
 from alrin.cli import alrin_cli
+from alrin.pkginfo import get_existing_built
+from alrin.resolver import AlrinPathResolver
 from alrin.workflow.pkgbuild import PYTHON_VERSION_SUFFIX
 from fixtures.manager import AlrinFixtureManager
 from fixtures.read_database import read_database
@@ -37,6 +39,13 @@ def test_add_success(
         assert reader['pkgver'] == '1'
         assert reader['pkgrel'] == '1'
         assert 'add_pkgrel_suffix' not in reader
+
+    resolver = AlrinPathResolver(vault)
+    original_built = get_existing_built(resolver)
+
+    assert len(original_built) == 2
+    assert original_built[0].info.pkgname == 'dummy'
+    assert original_built[0].info.pkgarch == 'any'
 
     db_packages = read_database(
         temp_vault_path.joinpath('pkgdest', 'any', 'alrin.db.tar'),

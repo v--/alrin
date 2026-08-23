@@ -7,7 +7,7 @@ import click
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import bind_logger_to_subject
-from alrin.metadata import AlrinPkgbuildMetadata, AlrinPackageVersion
+from alrin.metadata import AlrinPackageVersion, AlrinPkgbuildMetadata
 from alrin.pkginfo import AlrinBuiltPackage, get_existing_built, get_newly_built
 from alrin.source import AlrinPackageSource
 
@@ -44,18 +44,20 @@ def process_built_files(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
     built_files = get_newly_built(pkg)
     ignored_files = set[AlrinBuiltPackage]()
 
-    for existing in get_existing_built(pkg.shared):
+    for existing in get_existing_built(pkg.shared.resolver):
         if existing.info.pkgbase != pkg.pkgname:
             continue
-
-        existing_rel = existing.path.relative_to(pkg.shared.resolver.get_dest())
+        elif existing.is_copy():
+            # We will create a new copy
+            remove_built_file(existing)
+            continue
 
         try:
-            new = next(built for built in built_files if built.info.pkgname == existing.info.pkgname and built.info.pkgarch == existing.info.pkgarch)
+            new = next(built for built in built_files if built.info.pkgname == existing.info.pkgname)
         except StopIteration:
-            logger.warning(f'Package file {existing.path.name} exists in the destination, but not in the newly built files.')
+            logger.warning(f'Package file {existing.path.name} exists in the destination, but not among the newly built files.')
 
-            if click.confirm(f'Remove {existing_rel}?', True):
+            if click.confirm(f'Remove {existing.path.name}?', True):
                 remove_built_file(existing)
 
             continue
@@ -67,14 +69,14 @@ def process_built_files(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
             if old_hash == new_hash:
                 logger.info(f'Package file {existing.path.name} has not changed.')
             else:
-                logger.warning(f'Package file {existing.path.name} rebuilt with the same version, but is different from the old one.')
+                logger.warning(f'Package file {existing.path.name} has been rebuilt with the same version, but is different from the old one.')
 
-            if click.confirm(f'Replace the existing {existing_rel.as_posix()!s}?', False):
+            if click.confirm(f'Replace the existing {existing.path.name}?', False):
                 remove_built_file(existing)
             else:
                 ignored_files.add(new)
         else:
-            logger.info(f'Removing old {existing_rel.as_posix()!s}.')
+            logger.info(f'Removing old {existing.path.name}.')
             remove_built_file(existing)
 
     builddate: int | None = None

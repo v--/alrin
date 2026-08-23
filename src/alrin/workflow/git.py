@@ -62,6 +62,7 @@ def update_repo(pkg: AlrinPackageSource) -> None:
         pkg.repo.head.set_target(remote_head.oid)
 
     clean_worktree(pkg)
+    pkg.reread_version()
 
 
 @bind_logger_to_subject(logger, lambda _, pkgname: pkgname)
