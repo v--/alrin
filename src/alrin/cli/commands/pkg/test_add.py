@@ -52,8 +52,9 @@ def test_add_success(
     )
 
     assert len(db_packages) == 1
-    assert db_packages[0].name == 'dummy'
+    assert db_packages[0].pkgname == 'dummy'
     assert db_packages[0].version == '1-1'
+    assert db_packages[0].arch == 'any'
 
 
 def test_add_invalid_path(
@@ -136,7 +137,7 @@ def test_add_pypi_success(
     )
 
     assert len(db_packages) == 1
-    assert db_packages[0].name == 'python-dummy'
+    assert db_packages[0].pkgname == 'python-dummy'
     assert db_packages[0].version == '1-1' + PYTHON_VERSION_SUFFIX
 
 
@@ -170,7 +171,7 @@ def test_add_subpackages_success(
     )
 
     assert len(db_packages) == 2
-    assert db_packages[0].name == 'a'
+    assert db_packages[0].pkgname == 'a'
     assert db_packages[0].version == '1-1'
-    assert db_packages[1].name == 'b'
+    assert db_packages[1].pkgname == 'b'
     assert db_packages[1].version == '1-1'

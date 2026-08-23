@@ -8,7 +8,8 @@ from typing import IO
 
 @dataclass
 class AlpmPackageInfo:
-    name: str
+    pkgname: str
+    pkgbase: str
     version: str
     arch: str
 
@@ -42,7 +43,8 @@ def process_pkgtar(file: IO[bytes]) -> AlpmPackageInfo:
     full_data = dict(process_pkgtar_iter(file))
 
     return AlpmPackageInfo(
-        name=full_data['NAME'],
+        pkgname=full_data['NAME'],
+        pkgbase=full_data['BASE'],
         version=full_data['VERSION'],
-        arch=full_data.get('ARCH', 'any'),
+        arch=full_data['ARCH'],
     )
