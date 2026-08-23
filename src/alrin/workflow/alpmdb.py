@@ -4,7 +4,7 @@ import subprocess
 from collections.abc import Sequence
 
 from alrin.exceptions import AlrinPackageMetadataError
-from alrin.pkginfo import AlrinBuiltPackage, get_existing_built
+from alrin.pkginfo import AlrinBuiltPackage, PackageNameArchPair
 from alrin.state import AlrinSharedState
 from alrin.wrappers import repo_add, repo_remove
 
@@ -12,7 +12,7 @@ from alrin.wrappers import repo_add, repo_remove
 logger = logging.getLogger(__name__)
 
 
-def alpmdb_add_packages(shared: AlrinSharedState, new_packages: Sequence[AlrinBuiltPackage]) -> None:
+def alpmdb_add_package_files(shared: AlrinSharedState, new_packages: Sequence[AlrinBuiltPackage]) -> None:
     dest = shared.resolver.get_dest()
     new_package_paths = [built.path for built in new_packages]
 
@@ -45,30 +45,28 @@ def alpmdb_add_packages(shared: AlrinSharedState, new_packages: Sequence[AlrinBu
             raise AlrinPackageMetadataError('Repository update failed') from err
 
 
-def alpmdb_remove_packages(shared: AlrinSharedState, *pkgnames: str) -> None:
-    existing_built = get_existing_built(shared)
+def alpmdb_remove_packages(shared: AlrinSharedState, arch: str, pkgnames: Sequence[str]) -> None:
+    path_to_db = pathlib.Path(arch) / shared.meta.database.get_db_file_name()
 
-    package_names = list({
-        built.info.pkgname for built in existing_built if built.info.pkgbase in pkgnames
-    })
+    pkg_len = len(pkgnames)
+    logger.info(f'Adding {pkg_len} {'package' if pkg_len == 1 else 'packages'} to {path_to_db}.')
 
-    architectures = list({
-        arch
-        for built in existing_built if built.info.pkgbase in pkgnames
-        for arch in built.iter_arch()
-    })
+    try:
+        repo_remove(
+            path_to_db=path_to_db,
+            package_names=pkgnames,
+            quiet=True,
+            sign=True,
+            cwd=shared.resolver.get_dest(),
+        )
+    except subprocess.CalledProcessError as err:
+        raise AlrinPackageMetadataError('Repository update failed') from err
 
-    for arch in architectures:
-        path_to_db = pathlib.Path(arch) / shared.meta.database.get_db_file_name()
-        logger.info(f'Removing {len(package_names)} {'package' if len(package_names) == 1 else 'packages'} from {path_to_db}.')
 
-        try:
-            repo_remove(
-                path_to_db=path_to_db,
-                package_names=package_names,
-                quiet=True,
-                sign=True,
-                cwd=shared.resolver.get_dest(),
-            )
-        except subprocess.CalledProcessError as err:
-            raise AlrinPackageMetadataError('Repository update failed') from err
+def alpmdb_bulk_remove_packages(shared: AlrinSharedState, pairs: Sequence[PackageNameArchPair]) -> None:
+    for arch in {arch for pkgname, arch in pairs}:
+        alpmdb_remove_packages(
+            shared,
+            arch,
+            [pkgname for pkgname, a in pairs if a == arch],
+        )

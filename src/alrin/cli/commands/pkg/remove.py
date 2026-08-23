@@ -7,7 +7,8 @@ from alrin.logging import bind_logger_to_subject, setup_logging
 from alrin.pkginfo import get_existing_built
 from alrin.resolver import AlrinPathResolver
 from alrin.state import AlrinSharedState
-from alrin.workflow import alpmdb_remove_packages, remove_built_file, unregister_submodule
+from alrin.workflow import alpmdb_bulk_remove_packages, remove_built_file, unregister_submodule
+from alrin.workflow.dest import PackageNameArchPair
 
 from .group import pkg as pkg_cli
 
@@ -39,12 +40,12 @@ def remove(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
             logger.info('Clearing Viat metadata.')
             mut.clear()
 
-    existing_built = [existing for existing in get_existing_built(shared) if existing.info.pkgbase == pkgname]
+    existing_built = [pair for pair in get_existing_built(shared.resolver) if pair.built.info.pkgbase == pkgname]
 
     if len(existing_built) > 0:
         logger.info('Updating ALPM database.')
-        alpmdb_remove_packages(shared, pkgname)
+        alpmdb_bulk_remove_packages(shared, [PackageNameArchPair(built.info.pkgname, arch) for built, arch in existing_built])
 
-    for existing in existing_built:
-        logger.info(f'Removing {existing.path.parent.name}/{existing.path.name}.')
+    for existing, arch in existing_built:
+        logger.info(f'Removing {arch}/{existing.path.name}.')
         remove_built_file(existing)

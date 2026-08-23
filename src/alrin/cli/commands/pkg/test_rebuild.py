@@ -6,11 +6,8 @@ from click.testing import CliRunner
 from viat import ViatVault
 
 from alrin.cli import alrin_cli
-from alrin.pkginfo import get_existing_built
 from alrin.resolver import AlrinPathResolver
-from alrin.source import AlrinPackageSource
 from alrin.wrappers import alpm_srcinfo_create
-from fixtures import mock_makepkg
 from fixtures.git import git_commit
 from fixtures.manager import AlrinFixtureManager
 

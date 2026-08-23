@@ -6,11 +6,10 @@ from alrin.logging import bind_logger_to_subject, setup_logging
 from alrin.source import AlrinPackageSource
 from alrin.state import AlrinSharedState
 from alrin.workflow import (
-    alpmdb_add_packages,
     clean_worktree,
     makepkg_inside_jail,
     preprocess_pkgbuild,
-    process_built_files,
+    process_built_files_and_update_db,
     update_repo,
     update_version_from_build_files,
 )
@@ -41,7 +40,5 @@ def update(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
 
     makepkg_inside_jail(pkg)
     update_version_from_build_files(pkg)
-
-    dest_files = process_built_files(pkg)
+    process_built_files_and_update_db(pkg)
     clean_worktree(pkg)
-    alpmdb_add_packages(pkg.shared, dest_files)

@@ -1,5 +1,4 @@
 import functools
-import logging
 import re
 from dataclasses import dataclass
 from typing import Self, cast

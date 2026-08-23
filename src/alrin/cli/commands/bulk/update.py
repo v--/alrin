@@ -4,18 +4,18 @@ import click
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.logging import inject_subject, setup_logging
-from alrin.pkginfo import AlrinBuiltPackage
+from alrin.pkginfo import AlrinBuiltPackage, PackageNameArchPair
 from alrin.source import AlrinPackageSource
 from alrin.state import AlrinSharedState
 from alrin.workflow import (
-    alpmdb_add_packages,
+    alpmdb_add_package_files,
+    alpmdb_bulk_remove_packages,
     clean_worktree,
     makepkg_inside_jail,
     preprocess_pkgbuild,
-    process_built_files,
     update_repo,
-    update_version_from_build_files,
 )
+from alrin.workflow.dest import process_built_files
 
 from .group import bulk as bulk_cli
 
@@ -55,16 +55,17 @@ def update(shared: AlrinSharedState, verbose: bool) -> None:
             else:
                 updated.append(pkg)
 
-    dest_files = list[AlrinBuiltPackage]()
+    built_files_in_dest = list[AlrinBuiltPackage]()
+    obsolete_architectures = list[PackageNameArchPair]()
 
     for pkg in updated:
-        update_version_from_build_files(pkg)
-        dest_files.extend(
-            process_built_files(pkg),
-        )
+        processor = process_built_files(pkg)
+        built_files_in_dest.extend(processor.built_files_in_dest)
+        obsolete_architectures.extend(processor.obsolete_architectures)
         clean_worktree(pkg)
 
     if len(updated) > 0:
-        alpmdb_add_packages(shared, dest_files)
+        alpmdb_add_package_files(pkg.shared, processor.built_files_in_dest)
+        alpmdb_bulk_remove_packages(pkg.shared, obsolete_architectures)
     else:
         logger.info('No package updates.')

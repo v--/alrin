@@ -10,11 +10,10 @@ from alrin.resolver import AlrinPathResolver
 from alrin.source import AlrinPackageSource, read_srcinfo_with_retry
 from alrin.state import AlrinSharedState
 from alrin.workflow import (
-    alpmdb_add_packages,
     clean_worktree,
     makepkg_inside_jail,
     preprocess_pkgbuild,
-    process_built_files,
+    process_built_files_and_update_db,
     unregister_submodule,
     update_version_from_build_files,
 )
@@ -78,7 +77,5 @@ def add(shared: AlrinSharedState, pkgname: str, url_template: str, verbose: bool
     preprocess_pkgbuild(pkg)
     makepkg_inside_jail(pkg)
     update_version_from_build_files(pkg)
-
-    dest_files = process_built_files(pkg)
+    process_built_files_and_update_db(pkg)
     clean_worktree(pkg)
-    alpmdb_add_packages(pkg.shared, dest_files)

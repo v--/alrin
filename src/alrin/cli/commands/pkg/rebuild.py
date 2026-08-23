@@ -5,11 +5,10 @@ from alrin.logging import setup_logging
 from alrin.source import AlrinPackageSource
 from alrin.state import AlrinSharedState
 from alrin.workflow import (
-    alpmdb_add_packages,
     clean_worktree,
     makepkg_inside_jail,
     preprocess_pkgbuild,
-    process_built_files,
+    process_built_files_and_update_db,
     update_version_from_build_files,
 )
 
@@ -33,6 +32,5 @@ def rebuild(shared: AlrinSharedState, pkgname: str, verbose: bool) -> None:
     if pkg.version > pkg.viat_meta.version:
         raise AlrinPackageMetadataError(f'Package {pkgname} has dynamically updated its version and needs to be properly updated')
 
-    dest_files = process_built_files(pkg)
+    process_built_files_and_update_db(pkg)
     clean_worktree(pkg)
-    alpmdb_add_packages(pkg.shared, dest_files)

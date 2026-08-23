@@ -73,7 +73,7 @@ def test_update_success(
 
     # Verify that the old files are deleted
     updated_built = get_existing_built(resolver)
-    assert set.isdisjoint({b.path for b in original_built}, {b.path for b in updated_built})
+    assert set.isdisjoint({b.built.path for b in original_built}, {b.built.path for b in updated_built})
 
     # Verify that the database contains only the new files
     db_packages = read_database(

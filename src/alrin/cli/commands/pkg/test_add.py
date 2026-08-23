@@ -44,8 +44,8 @@ def test_add_success(
     original_built = get_existing_built(resolver)
 
     assert len(original_built) == 2
-    assert original_built[0].info.pkgname == 'dummy'
-    assert original_built[0].info.pkgarch == 'any'
+    assert original_built[0].built.info.pkgname == 'dummy'
+    assert original_built[0].built.info.pkgarch == 'any'
 
     db_packages = read_database(
         temp_vault_path.joinpath('pkgdest', 'any', 'alrin.db.tar'),

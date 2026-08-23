@@ -2,7 +2,7 @@ import pathlib
 import tarfile
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
-from typing import get_type_hints
+from typing import NamedTuple, get_type_hints
 
 from alrin.exceptions import AlrinPackageMetadataError
 from alrin.resolver import AlrinPathResolver
@@ -26,9 +26,6 @@ class AlrinBuiltPackage:
         self.path = path
         self.info = extract_pkginfo(self.path)
 
-    def is_copy(self) -> bool:
-        return self.info.pkgarch != self.path.parent.name
-
     def get_signature_path(self) -> pathlib.Path:
         return self.path.with_name(self.path.name + '.sig')
 
@@ -37,6 +34,19 @@ class AlrinBuiltPackage:
 
         if self.info.pkgarch == 'any':
             yield 'x86_64'
+
+
+class PackageArchPair(NamedTuple):
+    built: AlrinBuiltPackage
+    arch: str
+
+    def is_copy(self) -> bool:
+        return self.built.info.pkgarch != self.arch
+
+
+class PackageNameArchPair(NamedTuple):
+    pkgname: str
+    arch: str
 
 
 def extract_pkginfo(pkg_path: pathlib.Path) -> AlrinBuildPkgInfo:
@@ -77,9 +87,9 @@ def get_newly_built(pkg: AlrinPackageSource) -> Sequence[AlrinBuiltPackage]:
     ]
 
 
-def get_existing_built(resolver: AlrinPathResolver) -> Sequence[AlrinBuiltPackage]:
+def get_existing_built(resolver: AlrinPathResolver) -> Sequence[PackageArchPair]:
     return [
-        AlrinBuiltPackage(pkg_path)
+        PackageArchPair(AlrinBuiltPackage(pkg_path), pkg_path.parent.name)
         for pkg_path in resolver.get_dest().rglob('*.pkg.*')
         if pkg_path.suffix not in {'.sig', '.db'}
     ]
