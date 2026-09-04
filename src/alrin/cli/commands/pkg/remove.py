@@ -43,7 +43,7 @@ def remove(shared: AlrinSharedState, pkgbase: str, verbose: bool) -> None:
 
     if len(existing_built) > 0:
         logger.info('Updating ALPM database.')
-        alpmdb_bulk_remove_packages(shared, existing_built)
+        alpmdb_bulk_remove_packages(shared, [], existing_built)
 
     for existing, arch in existing_built:
         logger.info(f'Removing {arch}/{existing.path.name}.')

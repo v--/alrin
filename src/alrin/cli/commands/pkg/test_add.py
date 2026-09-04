@@ -56,6 +56,15 @@ def test_add_success(
     assert db_packages[0].version == '1-1'
     assert db_packages[0].arch == 'any'
 
+    db_packages = read_database(
+        temp_vault_path.joinpath('pkgdest', 'x86_64', 'alrin.db.tar'),
+    )
+
+    assert len(db_packages) == 1
+    assert db_packages[0].pkgname == 'dummy'
+    assert db_packages[0].version == '1-1'
+    assert db_packages[0].arch == 'any'
+
 
 def test_add_invalid_path(
     temp_vault_path: pathlib.Path,

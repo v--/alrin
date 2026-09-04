@@ -43,7 +43,7 @@ def update_version_from_build_files(pkg: AlrinPackageSource) -> None:
 class BuiltFileProcessor:
     newly_built: MutableSequence[AlrinBuiltPackage]
     existing_built: MutableSequence[PackageArchPair]
-    obsolete_architectures: MutableSequence[PackageArchPair]
+    obsolete_built: MutableSequence[PackageArchPair]
     built_files_in_dest: MutableSequence[AlrinBuiltPackage]
     ignored_new_files: MutableSet[AlrinBuiltPackage]
 
@@ -51,7 +51,7 @@ class BuiltFileProcessor:
         self.newly_built = []
         self.existing_built = []
         self.ignored_new_files = set()
-        self.obsolete_architectures = []
+        self.obsolete_built = []
         self.built_files_in_dest = []
 
     def disseminate_file(self, resolver: AlrinPathResolver, built: AlrinBuiltPackage) -> None:
@@ -73,13 +73,13 @@ class BuiltFileProcessor:
     def remove_from_obsolete(self, pkgname: str, arch: str) -> None:
         try:
             obs_index = next(
-                i for i, o in enumerate(self.obsolete_architectures)
+                i for i, o in enumerate(self.obsolete_built)
                 if o.built.info.pkgname == pkgname and o.arch == arch
             )
         except StopIteration:
             pass
         else:
-            del self.obsolete_architectures[obs_index]
+            del self.obsolete_built[obs_index]
 
     def _process_existing_built(self, pkg: AlrinPackageSource) -> None:
         for existing_pair in self.existing_built:
@@ -88,7 +88,7 @@ class BuiltFileProcessor:
             if existing.info.pkgbase != pkg.pkgbase:
                 continue
             elif existing.info.arch != dest_arch:
-                self.obsolete_architectures.append(existing_pair)
+                self.obsolete_built.append(existing_pair)
                 continue
 
             try:
@@ -155,8 +155,8 @@ class BuiltFileProcessor:
             mut['builddate'] = builddate
             pkg.viat_meta = AlrinPkgbuildMetadata.from_json(mut)
 
-    def clean_obsolete_files(self) -> None:
-        for existing, arch in self.obsolete_architectures:
+    def clean_obsolete_built(self) -> None:
+        for existing, arch in self.obsolete_built:
             logger.debug(f'Removing obsolete copy {existing.path.name} for {arch}.')
             remove_built_file(existing)
 
@@ -174,6 +174,6 @@ def process_built_files(*pkgs: AlrinPackageSource) -> None:
         with inject_subject(logger, pkg.pkgbase):
             processor.process_pkg(pkg)
 
-    processor.clean_obsolete_files()
+    processor.clean_obsolete_built()
     alpmdb_add_package_files(pkg.shared, processor.built_files_in_dest)
-    alpmdb_bulk_remove_packages(pkg.shared, processor.obsolete_architectures)
+    alpmdb_bulk_remove_packages(pkg.shared, processor.built_files_in_dest, processor.obsolete_built)

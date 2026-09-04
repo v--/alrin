@@ -83,3 +83,12 @@ def test_update_success(
     assert len(db_packages) == 1
     assert db_packages[0].pkgname == 'dummy'
     assert db_packages[0].version == '2-1'
+
+    # Also verify that the x86_64 package is in place
+    db_packages = read_database(
+        temp_vault_path.joinpath('pkgdest', 'x86_64', 'alrin.db.tar'),
+    )
+
+    assert len(db_packages) == 1
+    assert db_packages[0].pkgname == 'dummy'
+    assert db_packages[0].version == '2-1'
