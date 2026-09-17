@@ -1,4 +1,6 @@
+import json
 import logging
+import pathlib
 
 import click
 
@@ -10,9 +12,9 @@ from alrin.workflow import (
     clean_worktree,
     makepkg_inside_jail,
     preprocess_pkgbuild,
+    process_built_files,
     update_repo,
 )
-from alrin.workflow.dest import process_built_files
 
 from .group import bulk as bulk_cli
 
@@ -22,8 +24,9 @@ logger = logging.getLogger(__name__)
 
 @bulk_cli.command()
 @click.option('-v', '--verbose', is_flag=True)
+@click.option('--summary-path', type=click.Path(writable=True, dir_okay=False, path_type=pathlib.Path))
 @click.pass_obj
-def update(shared: AlrinSharedState, verbose: bool) -> None:
+def update(shared: AlrinSharedState, summary_path: pathlib.Path | None, verbose: bool) -> None:
     setup_logging(shared.verbose_logging or verbose)
     updated = list[AlrinPackageSource]()
 
@@ -51,6 +54,19 @@ def update(shared: AlrinSharedState, verbose: bool) -> None:
                     raise click.ClickException('Update aborted') from err
             else:
                 updated.append(pkg)
+
+    if summary_path:
+        with summary_path.open('w') as json_file:
+            json.dump(
+                [
+                    {
+                        'pkgbase': pkg.pkgbase,
+                        'oldVersion': str(pkg.viat_meta.version),
+                        'newVersion': str(pkg.version),
+                    } for pkg in updated
+                ],
+                json_file,
+            )
 
     if len(updated) == 0:
         logger.info('No package updates.')

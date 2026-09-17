@@ -38,6 +38,12 @@ The following updates all packages:
 alrin bulk update
 ```
 
+If you want to generate reports for updated packages, you can use
+
+```shell
+alrin bulk update --summary-path summary.json
+```
+
 The [tricky job](https://stackoverflow.com/a/35743109/2756776) of removing a git submodule, along with the associated build files and Viat metadata, can be done by
 
 ```shell
