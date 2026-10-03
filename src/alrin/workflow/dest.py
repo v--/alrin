@@ -88,6 +88,7 @@ class BuiltFileProcessor:
             if existing.info.pkgbase != pkg.pkgbase:
                 continue
             elif existing.info.arch != dest_arch:
+                logger.debug(f'Marking copy of {existing.path.name} for architecture {existing.info.arch} as obsolete.')
                 self.obsolete_built.append(existing_pair)
                 continue
 
@@ -115,6 +116,7 @@ class BuiltFileProcessor:
                 else:
                     for arch in existing.iter_arch():
                         self.remove_from_obsolete(existing.info.pkgname, arch)
+                        logger.debug(f'Unmarking copy of {existing.path.name} for architecture {existing.info.arch} as obsolete.')
 
                     self.ignored_new_files.add(new)
             else:
