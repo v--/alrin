@@ -71,7 +71,7 @@ def alpmdb_bulk_remove_packages(
     for arch in {arch for built, arch in obsolete_pairs}:
         to_remove = list({
             built.info.pkgname for built, a in obsolete_pairs
-            if a == arch and not any(valid_built.info.pkgname == built.info.pkgname and arch in valid_built.iter_arch() for valid_built in valid_built)
+            if a == arch and not any(valid.info.pkgname == built.info.pkgname and arch in valid.iter_arch() for valid in valid_built)
         })
 
         alpmdb_remove_packages(shared, arch, to_remove)
